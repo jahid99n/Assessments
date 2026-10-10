@@ -1,0 +1,28 @@
+<testsuites id="" name="" tests="11" failures="0" skipped="0" errors="0" time="26.014903">
+<testsuite name="accessibility.spec.js" timestamp="2026-10-10T15:26:52.895Z" hostname="" tests="5" failures="0" skipped="0" time="8.981" errors="0">
+<testcase name="accessibility: /" classname="accessibility.spec.js" time="2.65">
+</testcase>
+<testcase name="accessibility: /expenses" classname="accessibility.spec.js" time="1.887">
+</testcase>
+<testcase name="accessibility: /receipts" classname="accessibility.spec.js" time="1.436">
+</testcase>
+<testcase name="accessibility: /budget" classname="accessibility.spec.js" time="1.521">
+</testcase>
+<testcase name="accessibility: expense dialog" classname="accessibility.spec.js" time="1.487">
+</testcase>
+</testsuite>
+<testsuite name="dashboard.spec.js" timestamp="2026-10-10T15:26:52.895Z" hostname="" tests="6" failures="0" skipped="0" time="14.924" errors="0">
+<testcase name="desktop dashboard renders real charts and screenshot" classname="dashboard.spec.js" time="1.71">
+</testcase>
+<testcase name="manual create, edit, details, filter, pagination and delete" classname="dashboard.spec.js" time="2.014">
+</testcase>
+<testcase name="budget changes persist and notifications stay labelled simulated" classname="dashboard.spec.js" time="1.358">
+</testcase>
+<testcase name="receipt simulation reports processing then successful or failed outcome" classname="dashboard.spec.js" time="6.733">
+</testcase>
+<testcase name="mobile layout stays within viewport and supports navigation and sign-out" classname="dashboard.spec.js" time="2.219">
+</testcase>
+<testcase name="tablet navigation is accessible and receipt page fits" classname="dashboard.spec.js" time="0.89">
+</testcase>
+</testsuite>
+</testsuites>

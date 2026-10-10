@@ -1,0 +1,23 @@
+{
+  "checks": 4,
+  "passed": 4,
+  "failed": 0,
+  "results": [
+    {
+      "name": "demo production build is rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "development NODE_ENV build bypass is rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "production bundles exclude the demo adapter, storage and seed data",
+      "result": "PASS"
+    },
+    {
+      "name": "unconfigured production build fails closed in a real browser without AWS calls",
+      "result": "PASS"
+    }
+  ]
+}

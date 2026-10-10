@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1160" viewBox="0 0 1600 1160" font-family="Inter, DejaVu Sans, sans-serif">
+<defs>
+<marker id="muser" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563EB"/></marker>
+<marker id="mproc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ED7100"/></marker>
+<marker id="msched" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8C4FFF"/></marker>
+<marker id="maux" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6B7280"/></marker>
+</defs>
+<rect width="1600" height="1160" fill="#ffffff"/>
+<text x="40" y="48" font-size="28" font-weight="700" fill="#111827">Smart Expense Tracker – AWS Architecture</text>
+<text x="40" y="76" font-size="15" fill="#4B5563">Serverless, event-driven design · processing separated from storage · region ap-southeast-2 (Sydney)</text>
+<rect x="245" y="100" width="1325" height="830" rx="14" fill="#F8FAFC" stroke="#232F3E" stroke-width="1.5" stroke-dasharray="8 5"/>
+<rect x="245" y="100" width="300" height="30" rx="6" fill="#232F3E"/><text x="258" y="121" font-size="14" font-weight="600" fill="#fff">AWS Cloud · ap-southeast-2 (Sydney)</text>
+<text x="290" y="158" font-size="12" font-weight="700" letter-spacing="1" fill="#6B7280">PRESENTATION &amp; ACCESS</text>
+<text x="620" y="158" font-size="12" font-weight="700" letter-spacing="1" fill="#6B7280">PROCESSING (Lambda)</text>
+<text x="970" y="158" font-size="12" font-weight="700" letter-spacing="1" fill="#6B7280">STORAGE &amp; AI</text>
+<text x="1310" y="158" font-size="12" font-weight="700" letter-spacing="1" fill="#6B7280">NOTIFICATION</text>
+<rect x="40" y="400" width="165" height="130" rx="10" fill="#fff" stroke="#545B64" stroke-width="2"/>
+<circle cx="122" cy="432" r="14" fill="#545B64"/><path d="M96,470 a26,22 0 0 1 52,0 z" fill="#545B64"/>
+<text x="122" y="496" font-size="15" font-weight="700" text-anchor="middle" fill="#111827">User</text>
+<text x="122" y="515" font-size="12.5" text-anchor="middle" fill="#374151">web browser / phone</text>
+<rect x="290" y="175" width="230" height="110" rx="10" fill="#fff" stroke="#DD344C" stroke-width="2"/>
+<rect x="302" y="189" width="40" height="40" rx="8" fill="#DD344C"/>
+<text x="322" y="215" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">AMP</text>
+<text x="352" y="207" font-size="15" font-weight="700" fill="#111827">AWS Amplify</text>
+<text x="352" y="227" font-size="12.5" fill="#374151">Hosts web dashboard</text>
+<text x="352" y="245" font-size="12.5" fill="#374151">HTML · JS · Chart.js</text>
+<rect x="290" y="355" width="230" height="110" rx="10" fill="#fff" stroke="#DD344C" stroke-width="2"/>
+<rect x="302" y="369" width="40" height="40" rx="8" fill="#DD344C"/>
+<text x="322" y="395" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">COG</text>
+<text x="352" y="387" font-size="15" font-weight="700" fill="#111827">Amazon Cognito</text>
+<text x="352" y="407" font-size="12.5" fill="#374151">User pool + hosted login</text>
+<text x="352" y="425" font-size="12.5" fill="#374151">issues JWT tokens</text>
+<rect x="290" y="535" width="230" height="110" rx="10" fill="#fff" stroke="#8C4FFF" stroke-width="2"/>
+<rect x="302" y="549" width="40" height="40" rx="8" fill="#8C4FFF"/>
+<text x="322" y="575" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">API</text>
+<text x="352" y="567" font-size="15" font-weight="700" fill="#111827">API Gateway</text>
+<text x="352" y="587" font-size="12.5" fill="#374151">HTTP API, JWT authorizer</text>
+<text x="352" y="605" font-size="12.5" fill="#374151">/expenses /stats /budget</text>
+<rect x="290" y="715" width="230" height="110" rx="10" fill="#fff" stroke="#7AA116" stroke-width="2"/>
+<rect x="302" y="729" width="40" height="40" rx="8" fill="#7AA116"/>
+<text x="322" y="755" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">S3</text>
+<text x="352" y="747" font-size="15" font-weight="700" fill="#111827">Amazon S3</text>
+<text x="352" y="767" font-size="12.5" fill="#374151">receipts/{userId}/{id}.jpg</text>
+<text x="352" y="785" font-size="12.5" fill="#374151">private, encrypted</text>
+<rect x="620" y="175" width="240" height="110" rx="10" fill="#fff" stroke="#E7157B" stroke-width="2"/>
+<rect x="632" y="189" width="40" height="40" rx="8" fill="#E7157B"/>
+<text x="652" y="215" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">EB</text>
+<text x="682" y="207" font-size="15" font-weight="700" fill="#111827">EventBridge Scheduler</text>
+<text x="682" y="227" font-size="12.5" fill="#374151">cron: Mon 09:00</text>
+<text x="682" y="245" font-size="12.5" fill="#374151">Australia/Sydney</text>
+<rect x="620" y="535" width="240" height="110" rx="10" fill="#fff" stroke="#ED7100" stroke-width="2"/>
+<rect x="632" y="549" width="40" height="40" rx="8" fill="#ED7100"/>
+<text x="652" y="575" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">λ</text>
+<text x="682" y="567" font-size="15" font-weight="700" fill="#111827">expense-api</text>
+<text x="682" y="587" font-size="12.5" fill="#374151">AWS Lambda · all API routes</text>
+<text x="682" y="605" font-size="12.5" fill="#374151">presigned upload URLs</text>
+<rect x="620" y="715" width="240" height="110" rx="10" fill="#fff" stroke="#ED7100" stroke-width="2"/>
+<rect x="632" y="729" width="40" height="40" rx="8" fill="#ED7100"/>
+<text x="652" y="755" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">λ</text>
+<text x="682" y="747" font-size="15" font-weight="700" fill="#111827">receipt-processor</text>
+<text x="682" y="767" font-size="12.5" fill="#374151">AWS Lambda · S3 trigger</text>
+<text x="682" y="785" font-size="12.5" fill="#374151">parse · categorise · save</text>
+<rect x="970" y="175" width="250" height="110" rx="10" fill="#fff" stroke="#ED7100" stroke-width="2"/>
+<rect x="982" y="189" width="40" height="40" rx="8" fill="#ED7100"/>
+<text x="1002" y="215" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">λ</text>
+<text x="1032" y="207" font-size="15" font-weight="700" fill="#111827">weekly-summary</text>
+<text x="1032" y="227" font-size="12.5" fill="#374151">AWS Lambda · scheduled</text>
+<text x="1032" y="245" font-size="12.5" fill="#374151">totals last 7 days per user</text>
+<rect x="970" y="535" width="250" height="110" rx="10" fill="#fff" stroke="#C925D1" stroke-width="2"/>
+<rect x="982" y="549" width="40" height="40" rx="8" fill="#C925D1"/>
+<text x="1002" y="575" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">DDB</text>
+<text x="1032" y="567" font-size="15" font-weight="700" fill="#111827">Amazon DynamoDB</text>
+<text x="1032" y="587" font-size="12.5" fill="#374151">table: Expenses</text>
+<text x="1032" y="605" font-size="12.5" fill="#374151">table: Budgets</text>
+<rect x="970" y="715" width="250" height="110" rx="10" fill="#fff" stroke="#01A88D" stroke-width="2"/>
+<rect x="982" y="729" width="40" height="40" rx="8" fill="#01A88D"/>
+<text x="1002" y="755" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">TX</text>
+<text x="1032" y="747" font-size="15" font-weight="700" fill="#111827">Amazon Textract</text>
+<text x="1032" y="767" font-size="12.5" fill="#374151">AnalyzeExpense API</text>
+<text x="1032" y="785" font-size="12.5" fill="#374151">merchant · date · total</text>
+<rect x="1310" y="355" width="230" height="110" rx="10" fill="#fff" stroke="#E7157B" stroke-width="2"/>
+<rect x="1322" y="369" width="40" height="40" rx="8" fill="#E7157B"/>
+<text x="1342" y="395" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">SNS</text>
+<text x="1372" y="387" font-size="15" font-weight="700" fill="#111827">Amazon SNS</text>
+<text x="1372" y="407" font-size="12.5" fill="#374151">topic: expense-alerts</text>
+<text x="1372" y="425" font-size="12.5" fill="#374151">filtered per user</text>
+<rect x="1310" y="175" width="230" height="90" rx="10" fill="#fff" stroke="#545B64" stroke-width="2" stroke-dasharray="5 4"/>
+<text x="1425" y="212" font-size="15" font-weight="700" text-anchor="middle" fill="#111827">User email inbox</text>
+<text x="1425" y="234" font-size="12.5" text-anchor="middle" fill="#374151">budget alerts · weekly summary</text>
+<rect x="290" y="870" width="1250" height="44" rx="10" fill="#fff" stroke="#E7157B" stroke-width="2"/>
+<rect x="302" y="878" width="28" height="28" rx="6" fill="#E7157B"/><text x="316" y="897" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">CW</text>
+<text x="342" y="897" font-size="14" fill="#111827"><tspan font-weight="700">Amazon CloudWatch</tspan>  –  logs from all Lambda functions · metrics dashboard · error alarm</text>
+<path d="M205,465 L228,465" stroke="#2563EB" stroke-width="2.2"/>
+<path d="M228,230 L228,770" stroke="#2563EB" stroke-width="2.2"/>
+<path d="M228,230.0 L290,230.0" fill="none" stroke="#2563EB" stroke-width="2.2"  marker-end="url(#muser)"/>
+<circle cx="259" cy="230.0" r="11" fill="#2563EB"/><text x="259" y="234.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+<path d="M228,410.0 L290,410.0" fill="none" stroke="#2563EB" stroke-width="2.2"  marker-end="url(#muser)"/>
+<circle cx="259" cy="410.0" r="11" fill="#2563EB"/><text x="259" y="414.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+<path d="M228,590.0 L290,590.0" fill="none" stroke="#2563EB" stroke-width="2.2"  marker-end="url(#muser)"/>
+<circle cx="259" cy="590.0" r="11" fill="#2563EB"/><text x="259" y="594.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+<path d="M228,770.0 L290,770.0" fill="none" stroke="#2563EB" stroke-width="2.2"  marker-end="url(#muser)"/>
+<circle cx="259" cy="770.0" r="11" fill="#2563EB"/><text x="259" y="774.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">6</text>
+<path d="M345,535 L345,465" fill="none" stroke="#6B7280" stroke-width="2.2" stroke-dasharray="6 4" marker-end="url(#maux)"/>
+<text x="352" y="510" font-size="11.5" fill="#6B7280" font-weight="600" text-anchor="start">verify JWT</text>
+<path d="M520,590.0 L620,590.0" fill="none" stroke="#2563EB" stroke-width="2.2"  marker-end="url(#muser)"/>
+<circle cx="565" cy="574.0" r="11" fill="#2563EB"/><text x="565" y="578.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+<path d="M860,590.0 L970,590.0" fill="none" stroke="#2563EB" stroke-width="2.2"  marker-end="url(#muser)"/>
+<text x="915" y="612.0" font-size="11.5" fill="#2563EB" font-weight="600" text-anchor="middle">read / write</text>
+<circle cx="915" cy="574.0" r="11" fill="#2563EB"/><text x="915" y="578.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+<path d="M520,770.0 L620,770.0" fill="none" stroke="#ED7100" stroke-width="2.2"  marker-end="url(#mproc)"/>
+<text x="565" y="792.0" font-size="11.5" fill="#ED7100" font-weight="600" text-anchor="middle">upload event</text>
+<circle cx="565" cy="754.0" r="11" fill="#ED7100"/><text x="565" y="758.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">7</text>
+<path d="M860,770.0 L970,770.0" fill="none" stroke="#ED7100" stroke-width="2.2"  marker-end="url(#mproc)"/>
+<text x="915" y="792.0" font-size="11.5" fill="#ED7100" font-weight="600" text-anchor="middle">extract</text>
+<circle cx="915" cy="754.0" r="11" fill="#ED7100"/><text x="915" y="758.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">8</text>
+<path d="M800,715 L800,690 L1030,690 L1030,645" fill="none" stroke="#ED7100" stroke-width="2.2"  marker-end="url(#mproc)"/>
+<text x="915" y="681" font-size="11.5" fill="#ED7100" font-weight="600" text-anchor="middle">save expense, check budget</text>
+<circle cx="800" cy="703" r="11" fill="#ED7100"/><text x="800" y="707.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">9</text>
+<path d="M700,825 L700,850 L1500,850 L1500,465" fill="none" stroke="#ED7100" stroke-width="2.2"  marker-end="url(#mproc)"/>
+<text x="1180" y="844" font-size="11.5" fill="#ED7100" font-weight="600" text-anchor="start">over-budget alert</text>
+<circle cx="1100" cy="850" r="11" fill="#ED7100"/><text x="1100" y="854.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">10</text>
+<path d="M860,230.0 L970,230.0" fill="none" stroke="#8C4FFF" stroke-width="2.2"  marker-end="url(#msched)"/>
+<circle cx="915" cy="214.0" r="11" fill="#8C4FFF"/><text x="915" y="218.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">11</text>
+<path d="M1095,285 L1095,535" fill="none" stroke="#8C4FFF" stroke-width="2.2"  marker-end="url(#msched)"/>
+<text x="1112" y="449" font-size="11.5" fill="#8C4FFF" font-weight="600" text-anchor="start">read expenses</text>
+<circle cx="1095" cy="445" r="11" fill="#8C4FFF"/><text x="1095" y="449.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">12</text>
+<path d="M1220,250.0 L1265,250.0 L1265,410.0 L1310,410.0" fill="none" stroke="#8C4FFF" stroke-width="2.2"  marker-end="url(#msched)"/>
+<circle cx="1265" cy="330" r="11" fill="#8C4FFF"/><text x="1265" y="334.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">13</text>
+<path d="M1425,355 L1425,265" fill="none" stroke="#6B7280" stroke-width="2.2"  marker-end="url(#maux)"/>
+<circle cx="1440" cy="312" r="11" fill="#6B7280"/><text x="1440" y="316.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">14</text>
+<rect x="620" y="340" width="240" height="150" rx="10" fill="#fff" stroke="#E5E7EB"/>
+<text x="634" y="366" font-size="13" font-weight="700" fill="#111827">Flows</text>
+<path d="M634,390 L674,390" stroke="#2563EB" stroke-width="2.5" />
+<text x="684" y="394" font-size="12.5" fill="#374151">User request / API</text>
+<path d="M634,416 L674,416" stroke="#ED7100" stroke-width="2.5" />
+<text x="684" y="420" font-size="12.5" fill="#374151">Receipt processing</text>
+<path d="M634,442 L674,442" stroke="#8C4FFF" stroke-width="2.5" />
+<text x="684" y="446" font-size="12.5" fill="#374151">Weekly summary</text>
+<path d="M634,468 L674,468" stroke="#6B7280" stroke-width="2.5" stroke-dasharray="6 4"/>
+<text x="684" y="472" font-size="12.5" fill="#374151">Auth · monitoring · email</text>
+<text x="40" y="968" font-size="15" font-weight="700" fill="#111827">Step-by-step</text>
+<circle cx="51" cy="995" r="11" fill="#2563EB"/><text x="51" y="999.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+<text x="70" y="1000" font-size="13" fill="#374151">User opens the web app hosted on Amplify</text>
+<circle cx="51" cy="1025" r="11" fill="#2563EB"/><text x="51" y="1029.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+<text x="70" y="1030" font-size="13" fill="#374151">User signs in with Cognito and receives a JWT</text>
+<circle cx="51" cy="1055" r="11" fill="#2563EB"/><text x="51" y="1059.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+<text x="70" y="1060" font-size="13" fill="#374151">Browser calls the API with the JWT</text>
+<circle cx="51" cy="1085" r="11" fill="#2563EB"/><text x="51" y="1089.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+<text x="70" y="1090" font-size="13" fill="#374151">API Gateway checks the JWT and invokes expense-api</text>
+<circle cx="51" cy="1115" r="11" fill="#2563EB"/><text x="51" y="1119.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+<text x="70" y="1120" font-size="13" fill="#374151">expense-api reads/writes DynamoDB; returns a presigned S3 URL</text>
+<circle cx="571" cy="995" r="11" fill="#2563EB"/><text x="571" y="999.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">6</text>
+<text x="590" y="1000" font-size="13" fill="#374151">Browser uploads the receipt photo straight to S3</text>
+<circle cx="571" cy="1025" r="11" fill="#ED7100"/><text x="571" y="1029.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">7</text>
+<text x="590" y="1030" font-size="13" fill="#374151">S3 upload event triggers receipt-processor</text>
+<circle cx="571" cy="1055" r="11" fill="#ED7100"/><text x="571" y="1059.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">8</text>
+<text x="590" y="1060" font-size="13" fill="#374151">Textract AnalyzeExpense reads merchant, date, total, GST</text>
+<circle cx="571" cy="1085" r="11" fill="#ED7100"/><text x="571" y="1089.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">9</text>
+<text x="590" y="1090" font-size="13" fill="#374151">Expense saved to DynamoDB; month total compared with budget</text>
+<circle cx="571" cy="1115" r="11" fill="#ED7100"/><text x="571" y="1119.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">10</text>
+<text x="590" y="1120" font-size="13" fill="#374151">If over budget, alert published to SNS</text>
+<circle cx="1091" cy="995" r="11" fill="#8C4FFF"/><text x="1091" y="999.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">11</text>
+<text x="1110" y="1000" font-size="13" fill="#374151">EventBridge runs weekly-summary every Monday 9am</text>
+<circle cx="1091" cy="1025" r="11" fill="#8C4FFF"/><text x="1091" y="1029.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">12</text>
+<text x="1110" y="1030" font-size="13" fill="#374151">weekly-summary totals each user’s last 7 days</text>
+<circle cx="1091" cy="1055" r="11" fill="#8C4FFF"/><text x="1091" y="1059.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">13</text>
+<text x="1110" y="1060" font-size="13" fill="#374151">Summary published to SNS</text>
+<circle cx="1091" cy="1085" r="11" fill="#6B7280"/><text x="1091" y="1089.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">14</text>
+<text x="1110" y="1090" font-size="13" fill="#374151">SNS emails the user (filtered by userId)</text>
+</svg>

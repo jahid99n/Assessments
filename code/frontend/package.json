@@ -1,0 +1,43 @@
+{
+  "name": "smart-expense-tracker-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "demo": "vite --mode demo --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:browser": "playwright test",
+    "test:build": "node tests/build-verification.mjs",
+    "format": "prettier --write src tests browser-tests *.js *.json *.html"
+  },
+  "dependencies": {
+    "aws-amplify": "6.22.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-router-dom": "^7.0.0",
+    "recharts": "3.10.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.50.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.0.0",
+    "@vitejs/plugin-react": "latest",
+    "eslint": "^10.12.0",
+    "eslint-plugin-react-hooks": "latest",
+    "globals": "latest",
+    "jsdom": "^26.1.0",
+    "prettier": "^3.9.10",
+    "vite": "8.3.4",
+    "vitest": "5.0.3"
+  }
+}
