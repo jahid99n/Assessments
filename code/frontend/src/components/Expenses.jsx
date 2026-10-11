@@ -189,6 +189,8 @@ export function ExpenseDialog({ action, item, onClose, onSaved }) {
                   {detail.currency || "Not extracted"}
                   {detail.currencySource === "application_default" &&
                     " (application default)"}
+                  {detail.currencySource === "assumed_from_dollar_sign" &&
+                    " (assumed from $ sign)"}
                 </dd>
                 {detail.confidence !== undefined && (
                   <>

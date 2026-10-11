@@ -49,7 +49,10 @@ non-negative, at most two decimal places, and capped at AUD 100,000,000. Refunds
 and currency conversion are not supported. JSON preserves exact Decimal numeric
 literals without float arithmetic. Frontend code must format currency carefully.
 Explicit non-AUD receipts/requests fail. Missing receipt currency uses AUD with
-`currencySource=application_default` so that assumption is visible.
+`currencySource=application_default` so that assumption is visible. Textract infers
+USD for a bare `$`; without an explicit `USD`/`US$` marker this is stored as AUD with
+`currencySource=assumed_from_dollar_sign` (found in live testing, 12 October 2026).
+A US receipt printing only `$` would therefore be counted as AUD.
 
 Dates are ISO `YYYY-MM-DD`; monthly periods use Australia/Sydney. Receipt text is
 parsed day-first: `04/11/2024` means 4 November. ISO, day-first hyphens and English

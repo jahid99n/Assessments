@@ -706,7 +706,7 @@
             }
           }
         ],
-        "PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-ApiRole-Boundary"
+        "PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-BoundaryApiRole"
       }
     },
     "ProcessorRole": {
@@ -786,7 +786,7 @@
             }
           }
         ],
-        "PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-ProcessorRole-Boundary"
+        "PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-BoundaryProcessorRole"
       }
     },
     "SummaryRole": {
@@ -857,7 +857,7 @@
             }
           }
         ],
-        "PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-SummaryRole-Boundary"
+        "PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-BoundarySummaryRole"
       }
     },
     "ScheduleGroup": {
@@ -907,7 +907,7 @@
             }
           }
         ],
-        "PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-SchedulerRole-Boundary"
+        "PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-BoundarySchedulerRole"
       }
     },
     "WeeklySchedule": {

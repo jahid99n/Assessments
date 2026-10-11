@@ -63,7 +63,7 @@ stack was found. SAM expands the application to **44 resources**:
 | Cognito pool, client, domain, managed-login branding                     | Pool configuration, client/domain/branding lifecycle, MFA configuration reads/writes and tags. Exact pool ARN after bootstrap. No administrative user-data APIs.                                                                                        |
 | SNS topic and topic policy                                               | Lifecycle, attributes/policy and tags on `smart-expense-expense-alerts`; no publishing, subscribing or subscription changes by deployment identities. Runtime roles retain their existing SNS permissions.                                              |
 | HTTP API and default stage                                               | API Gateway GET/POST/PUT/PATCH/DELETE on the exact API and children after bootstrap; includes integrations, JWT authorizer, routes, stage and tags created from SAM's OpenAPI definition.                                                               |
-| Scheduler group and weekly schedule                                      | Group/schedule lifecycle and tags on stack-generated name prefixes; only the application scheduler role can be passed.                                                                                                                                  |
+| Scheduler group and weekly schedule                                      | Group/schedule lifecycle and tags on stack-generated name prefixes; DeleteSchedule on `schedule/<app group>/*` for group deletion/rollback; only the application scheduler role can be passed.                                                          |
 | 4 log groups, 3 metric filters, 4 alarms                                 | Lifecycle, retention, filters and tags on exact Lambda log groups and stack-generated API log/alarm names; separate regional account-level log-delivery operations. No log-content reading granted.                                                     |
 
 The user policy additionally covers CloudFormation validation, changeset creation,
@@ -71,8 +71,10 @@ inspection/execution/deletion, stack status/events/resources/template reads, upd
 cancellation, rollback recovery and stack deletion. The AWS-managed SAM transform
 has its own CreateChangeSet permission. Packaging permits read/upload/delete and
 multipart cleanup **only within the artifact bucket's `ict5205-expenses/` prefix**.
-Artifact listing requires that prefix. No `s3:ListAllMyBuckets` or receipt content
-access is granted. SAM packaging may read object version/tag metadata.
+Prefix-filtered listing requires that prefix; a separate unconditioned `s3:ListBucket`
+on the exact artifact bucket ARN authorizes HeadBucket, which sends no `s3:prefix`
+(it also permits unfiltered key listing of that dedicated bucket only). No
+`s3:ListAllMyBuckets` or receipt content access is granted. SAM packaging may read object version/tag metadata.
 [SAM transform permission](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/control-access-with-iam.html),
 [SAM uploader implementation](https://github.com/aws/aws-sam-cli/blob/develop/samcli/lib/package/s3_uploader.py).
 
@@ -102,10 +104,10 @@ Use these names exactly because the boundary and role ARNs are referenced in JSO
 | `cloudformation-api-auth-policy.json`    | `ExpenseTracker-CfnApiAuth`                        | Execution role                                                             |
 | `cloudformation-iam-policy.json`         | `ExpenseTracker-CfnIam`                            | Execution role                                                             |
 | `temporary-first-deployment-policy.json` | `ExpenseTracker-CfnBootstrap`                      | Execution role temporarily, never the user/group                           |
-| `boundary-ApiRole.json`                  | `ExpenseTracker-ApiRole-Boundary`                  | Permissions boundary on ApiRole, applied by candidate template             |
-| `boundary-ProcessorRole.json`            | `ExpenseTracker-ProcessorRole-Boundary`            | Permissions boundary on ProcessorRole                                      |
-| `boundary-SummaryRole.json`              | `ExpenseTracker-SummaryRole-Boundary`              | Permissions boundary on SummaryRole                                        |
-| `boundary-SchedulerRole.json`            | `ExpenseTracker-SchedulerRole-Boundary`            | Permissions boundary on SchedulerRole                                      |
+| `boundary-ApiRole.json`                  | `ExpenseTracker-BoundaryApiRole`                   | Permissions boundary on ApiRole, set in source and candidate templates     |
+| `boundary-ProcessorRole.json`            | `ExpenseTracker-BoundaryProcessorRole`             | Permissions boundary on ProcessorRole                                      |
+| `boundary-SummaryRole.json`              | `ExpenseTracker-BoundarySummaryRole`               | Permissions boundary on SummaryRole                                        |
+| `boundary-SchedulerRole.json`            | `ExpenseTracker-BoundarySchedulerRole`             | Permissions boundary on SchedulerRole                                      |
 | `cloudformation-trust-policy.json`       | Trust for `ExpenseTracker-CloudFormationExecution` | Role's trust relationship, not a permissions policy                        |
 | `optional-amplify-deployer-policy.json`  | `ExpenseTracker-DeployAmplify`                     | Group only if frontend deployment is authorised and actual app ID rendered |
 
@@ -120,21 +122,28 @@ and stack-generated table ARN patterns. They are not execution-role boundaries.
 
 ## Required proposed template adjustments
 
-**The existing `infrastructure/template.yaml` is unchanged.**
-`template.with-boundaries.json` is a separate SAM candidate, using CloudFormation's
-equivalent JSON syntax. It adds only:
+**`infrastructure/template.yaml` now sets the four boundaries directly.** Each
+explicit `AWS::IAM::Role` (ApiRole, ProcessorRole, SummaryRole, SchedulerRole) has
+`PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/ExpenseTracker-Boundary<Role>'`,
+matching the administrator-owned policies and the `iam:PermissionsBoundary`
+conditions in `cloudformation-iam-policy.json`. The functions and schedule keep
+using these roles through `!GetAtt`, so SAM generates no additional roles. The
+user pool also carries `UserPoolTags: {Deployment: ict5205-expenses}`, which the
+bootstrap policy's tag-scoped pool management requires.
 
-1. The respective administrator-owned `PermissionsBoundary` ARN to each existing role.
-2. `UserPoolTags: {Deployment: ict5205-expenses}` for bootstrap Cognito isolation.
-3. `AllowedValues: [smart-expense]` for ProjectName, matching these policies.
-4. An adjusted relative CodeUri so the separate template still builds existing code.
+`template.with-boundaries.json` is a separate SAM candidate, using CloudFormation's
+equivalent JSON syntax. Relative to the source it differs only by:
+
+1. The boundary ARNs rendered with the literal account ID (same policies as the source).
+2. `AllowedValues: [smart-expense]` for ProjectName, matching these policies.
+3. An adjusted relative CodeUri so the separate template still builds existing code.
 
 No resources, route contracts or runtime role names/paths change. There are still
 44 transformed resources and the existing retain policies remain. IAM role names
 remain CloudFormation-generated, so `CAPABILITY_IAM` remains sufficient.
-Do not deploy the original unbounded template using these policies: CreateRole
-will intentionally be denied. Review the candidate or merge these four changes
-into the original before a separately authorised deployment. Regenerate policies
+The source template does not restrict ProjectName; deploy with
+`ProjectName=smart-expense`, since every resource ARN in these policies assumes it.
+A role without the exact boundary is intentionally denied CreateRole. Regenerate policies
 and boundaries whenever runtime permissions or resource names change.
 
 Role creation requires the exact `iam:PermissionsBoundary` condition. Setting a
@@ -170,9 +179,11 @@ The temporary execution policy covers:
   region.** API Gateway ARNs omit the account field. This is the main temporary
   overbreadth; run in a dedicated assessment account where practical, limit the
   attachment to the approved deployment window, and detach immediately afterward.
-- User-pool creation, requiring the Deployment request tag, and management of
-  Sydney pools carrying that same resource tag. Avoid using this reserved tag on
-  unrelated pools. Pool tags are present in the candidate's create request.
+- User-pool creation in Sydney (`CreateUserPool` has no resource type, so Resource
+  is `*`; the earlier request-tag requirement was removed after a confirmed denial).
+  **During bootstrap it can create, but not configure or delete, any Sydney pool.**
+  Every later call on a pool requires the `Deployment = ict5205-expenses` resource
+  tag, which both templates set. Avoid using this reserved tag on unrelated pools.
 - Creation of only `AWSServiceRoleForAPIGateway`, with the exact
   `iam:AWSServiceName = ops.apigateway.amazonaws.com` restriction. If an administrator
   has already provisioned this account-wide role, this grant need not be used.
@@ -215,7 +226,7 @@ The template's Sydney rule remains, but IAM provides independent restrictions.
 | IAM roles, policies, trust, PassRole and service-linked role bootstrap             | IAM is account-global, with no regional ARN component. Applying a Sydney RequestedRegion condition to IAM would break global endpoint calls. Exact role/policy names, application role prefixes, boundaries and service conditions provide the restriction. |
 | S3 bucket/object ARNs                                                              | ARNs contain neither region nor account; exact account-bearing bucket names, artifact prefix and request-region conditions are used. Bucket location is separately constrained on creation.                                                                 |
 | ValidateTemplate and GetTemplateSummary                                            | Inline/local templates have no existing stack ARN; Resource `*`, Sydney only. This reveals template structure, not account-wide data permissions.                                                                                                           |
-| Cognito CreateUserPool                                                             | No resource-level ARN before creation; Resource `*`, Sydney and Deployment request tag, temporary only.                                                                                                                                                     |
+| Cognito CreateUserPool                                                             | No resource type; Resource `*`, Sydney only, temporary only; pool management still requires the resource tag.                                                                                                                                                |
 | Cognito DescribeUserPoolDomain                                                     | Does not support resource-level scoping; Resource `*`, Sydney only. Reads domain metadata, not users.                                                                                                                                                       |
 | Logs delivery APIs, PutResourcePolicy, DescribeResourcePolicies, DescribeLogGroups | Account-level APIs without resource-level scope; Resource `*`, Sydney only. PutResourcePolicy is powerful and could alter regional service-delivery policies; retain it only for the documented HTTP API logging workflow and review changesets.            |
 | Textract AnalyzeExpense                                                            | Runtime processor boundary only, not deployment identities; API has no receipt ARN scope. Resource `*`, Sydney only.                                                                                                                                        |

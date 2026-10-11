@@ -45,11 +45,22 @@ def http_api_permissions(api_id, prefix):
     """
     api = f"arn:aws:apigateway:{REGION}::/apis/{api_id}"
     collections = [f"{api}/{kind}" for kind in ("authorizers", "integrations", "routes", "stages")]
+    # Tagging (including SAM's tag-on-create, confirmed by a live CloudFormation denial)
+    # is authorized on /tags/<URL-encoded V2 ARN>; during creation the ID is a literal *.
+    # GET/POST/DELETE are GetTags/TagResource/UntagResource. The ARN is case-sensitive.
+    encoded_api = f"arn%3Aaws%3Aapigateway%3A{REGION}%3A%3A%2Fv2%2Fapis%2F{api_id}"
+    tag_targets = [encoded_api] if api_id == "*" else [encoded_api, f"{encoded_api}%2F*"]
     return [
         statement(f"{prefix}HttpApi", ["apigateway:GET", "apigateway:PUT", "apigateway:PATCH", "apigateway:DELETE"], api),
         statement(f"{prefix}HttpApiCollections", ["apigateway:GET", "apigateway:POST"], collections),
         statement(f"{prefix}HttpApiChildren", ["apigateway:GET", "apigateway:PATCH", "apigateway:DELETE"],
                   [f"{resource}/*" for resource in collections]),
+        statement(f"{prefix}HttpApiTags", ["apigateway:GET", "apigateway:POST", "apigateway:DELETE"],
+                  [f"arn:aws:apigateway:{REGION}::/tags/{target}" for target in tag_targets]),
+        # The ApiGatewayV2 Stage handler checks apigateway:TagResource on the stages
+        # collection when tagging on create (confirmed by a live denial); Untag on update.
+        statement(f"{prefix}HttpApiStageTags", ["apigateway:TagResource", "apigateway:UntagResource"],
+                  [f"{api}/stages", f"{api}/stages/*"]),
     ]
 
 
@@ -65,7 +76,7 @@ def generate(account, api_id="REVIEW_API_ID", pool_id="ap-southeast-2_REVIEW", a
     arn = lambda service, resource: f"arn:aws:{service}:{REGION}:{account}:{resource}"
     iam = lambda resource: f"arn:aws:iam::{account}:{resource}"
     role_arns = {name: iam(f"role/{STACK}-{name}-*") for name in ROLES}
-    boundary = {name: iam(f"policy/ExpenseTracker-{name}-Boundary") for name in ROLES}
+    boundary = {name: iam(f"policy/ExpenseTracker-Boundary{name}") for name in ROLES}
     execution = iam("role/ExpenseTracker-CloudFormationExecution")
     stack = arn("cloudformation", f"stack/{STACK}/*")
     artifact_name = f"{PROJECT}-{account}-{REGION}-artifacts"
@@ -81,6 +92,7 @@ def generate(account, api_id="REVIEW_API_ID", pool_id="ap-southeast-2_REVIEW", a
     logs = [item + suffix for item in log_groups for suffix in ("", ":*")]
     schedule_group = arn("scheduler", f"schedule-group/{STACK}-ScheduleGroup-*")
     schedule = arn("scheduler", f"schedule/{STACK}-ScheduleGroup-*/{STACK}-WeeklySchedule-*")
+    schedule_in_group = arn("scheduler", f"schedule/{STACK}-ScheduleGroup-*/*")
     api_root = f"arn:aws:apigateway:{REGION}::/apis"
     pool = arn("cognito-idp", f"userpool/{pool_id}")
     docs = {}
@@ -99,6 +111,10 @@ def generate(account, api_id="REVIEW_API_ID", pool_id="ap-southeast-2_REVIEW", a
         statement("PassOnlyExecutionRole", ["iam:PassRole"], execution, regional=False,
                   condition={"StringEquals": {"iam:PassedToService": "cloudformation.amazonaws.com"}}),
         statement("ArtifactBucketLocation", ["s3:GetBucketLocation"], artifact),
+        # HeadBucket is authorized as s3:ListBucket but carries no s3:prefix, so the
+        # prefix-conditioned statement below can never allow it. This also permits an
+        # unfiltered key listing of the dedicated artifact bucket (never receipts).
+        statement("HeadArtifactBucket", ["s3:ListBucket"], artifact),
         statement("ListArtifactPrefix", ["s3:ListBucket"], artifact,
                   condition={"StringLike": {"s3:prefix": [STACK, f"{STACK}/*"]}}),
         statement("ManageDeploymentArtifacts", ["s3:GetObject", "s3:GetObjectVersion", "s3:GetObjectTagging", "s3:PutObject", "s3:DeleteObject",
@@ -150,12 +166,20 @@ def generate(account, api_id="REVIEW_API_ID", pool_id="ap-southeast-2_REVIEW", a
             "lambda:GetPolicy", "lambda:RemovePermission", "lambda:TagResource", "lambda:UntagResource",
             "lambda:ListTags", "lambda:PutFunctionEventInvokeConfig", "lambda:GetFunctionEventInvokeConfig",
             "lambda:UpdateFunctionEventInvokeConfig", "lambda:DeleteFunctionEventInvokeConfig"], functions),
+        # SAM's EventInvokeConfig uses Qualifier $LATEST; a qualified ARN does not match
+        # the unqualified function ARN above. Only these actions get the qualified ARN.
+        statement("ManageLatestEventInvokeConfigs", ["lambda:PutFunctionEventInvokeConfig",
+            "lambda:GetFunctionEventInvokeConfig", "lambda:UpdateFunctionEventInvokeConfig",
+            "lambda:DeleteFunctionEventInvokeConfig"], [f"{function}:$LATEST" for function in functions]),
         statement("OnlyApiGatewayAndS3InvocationGrants", ["lambda:AddPermission"], functions,
             condition={"StringEquals": {"lambda:Principal": ["apigateway.amazonaws.com", "s3.amazonaws.com"]}}),
         statement("ManageScheduleGroup", ["scheduler:CreateScheduleGroup", "scheduler:GetScheduleGroup",
             "scheduler:DeleteScheduleGroup", "scheduler:ListTagsForResource", "scheduler:TagResource", "scheduler:UntagResource"], schedule_group),
         statement("ManageWeeklySchedule", ["scheduler:CreateSchedule", "scheduler:GetSchedule",
             "scheduler:UpdateSchedule", "scheduler:DeleteSchedule"], schedule),
+        # The ScheduleGroup delete handler (including rollback) deletes the group's
+        # schedules, authorized against schedule/<group>/*; delete only, own groups only.
+        statement("DeleteSchedulesInApplicationGroup", ["scheduler:DeleteSchedule"], schedule_in_group),
         statement("ManageLogGroupsAndFilters", ["logs:CreateLogGroup", "logs:DeleteLogGroup", "logs:PutRetentionPolicy",
             "logs:DeleteRetentionPolicy", "logs:PutMetricFilter", "logs:DeleteMetricFilter", "logs:DescribeMetricFilters",
             "logs:TagResource", "logs:UntagResource", "logs:ListTagsForResource", "logs:TagLogGroup",
@@ -182,8 +206,9 @@ def generate(account, api_id="REVIEW_API_ID", pool_id="ap-southeast-2_REVIEW", a
     docs["temporary-first-deployment-policy.json"] = policy(
         statement("CreateHttpApi", ["apigateway:POST", "apigateway:PUT"], api_root),
         *http_api_permissions("*", "ManageInitiallyUnknown"),
-        statement("CreateTaggedUserPool", ["cognito-idp:CreateUserPool"], "*",
-                  condition={"StringEquals": {"aws:RequestTag/Deployment": STACK}}),
+        # CreateUserPool has no resource type, so Resource must be "*". Creation is
+        # Sydney-only; every later call on the new pool still needs the Deployment tag.
+        statement("CreateUserPoolInSydney", ["cognito-idp:CreateUserPool"], "*"),
         statement("ManageInitiallyUnknownUserPool", cognito_actions, arn("cognito-idp", "userpool/*"),
                   condition={"StringEquals": {"aws:ResourceTag/Deployment": STACK}}),
         statement("BootstrapApiGatewayServiceRole", ["iam:CreateServiceLinkedRole"],
