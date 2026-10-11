@@ -57,6 +57,21 @@ def test_receipt_invocation_is_restricted_to_exact_bucket_and_account():
     assert R['Receipts']['Properties']['NotificationConfiguration']['LambdaConfigurations'][0]['Event']=='s3:ObjectCreated:*'
 
 
+def test_user_pool_carries_bootstrap_deployment_tag():
+    # The temporary bootstrap policy manages only pools tagged for this stack.
+    assert R['Users']['Properties']['UserPoolTags'] == {'Deployment': 'ict5205-expenses'}
+
+
+@pytest.mark.parametrize('role', ['ApiRole', 'ProcessorRole', 'SummaryRole', 'SchedulerRole'])
+def test_each_runtime_role_has_its_administrator_owned_boundary(role):
+    props = R[role]["Properties"]
+    assert R[role]["Type"] == 'AWS::IAM::Role'
+    assert props["PermissionsBoundary"] == {
+        'Fn::Sub': f'arn:${{AWS::Partition}}:iam::${{AWS::AccountId}}:policy/ExpenseTracker-Boundary{role}'}
+    # Generated names must keep matching the execution policy's ict5205-expenses-<Role>-* scope.
+    assert 'RoleName' not in props and 'Path' not in props
+
+
 @pytest.mark.parametrize('role', ['ApiRole', 'ProcessorRole', 'SummaryRole', 'SchedulerRole'])
 def test_roles_have_no_broad_data_permissions(role):
     for policy in R[role]["Properties"]["Policies"]:

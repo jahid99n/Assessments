@@ -14,7 +14,7 @@ def validate_http_api_pair(action, resource):
     """Check each pair against the project's supported V2 SAR resource types.
 
     Wildcards in identifiers remain patterns, not evidence of resource ownership.
-    This deliberately rejects REST tagging resources for this HTTP-only template.
+    Tagging resources are accepted only when they wrap an encoded /v2/apis ARN.
     """
     reference = json.loads((HERE / "apigateway-v2-reference.json").read_text(encoding="utf-8"))
     verb = action.split(":", 1)[1]

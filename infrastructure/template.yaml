@@ -113,6 +113,7 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       UserPoolName: !Sub '${ProjectName}-users'
+      UserPoolTags: {Deployment: ict5205-expenses}
       UserPoolTier: ESSENTIALS
       UsernameAttributes: [email]
       AutoVerifiedAttributes: [email]
@@ -250,6 +251,7 @@ Resources:
   ApiRole:
     Type: AWS::IAM::Role
     Properties:
+      PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/ExpenseTracker-BoundaryApiRole'
       AssumeRolePolicyDocument: &lambdaTrust
         Version: '2012-10-17'
         Statement: [{Effect: Allow, Principal: {Service: lambda.amazonaws.com}, Action: 'sts:AssumeRole'}]
@@ -285,6 +287,7 @@ Resources:
   ProcessorRole:
     Type: AWS::IAM::Role
     Properties:
+      PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/ExpenseTracker-BoundaryProcessorRole'
       AssumeRolePolicyDocument: *lambdaTrust
       Policies:
         - PolicyName: ReceiptData
@@ -308,6 +311,7 @@ Resources:
   SummaryRole:
     Type: AWS::IAM::Role
     Properties:
+      PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/ExpenseTracker-BoundarySummaryRole'
       AssumeRolePolicyDocument: *lambdaTrust
       Policies:
         - PolicyName: SummaryData
@@ -330,6 +334,7 @@ Resources:
   SchedulerRole:
     Type: AWS::IAM::Role
     Properties:
+      PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/ExpenseTracker-BoundarySchedulerRole'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:

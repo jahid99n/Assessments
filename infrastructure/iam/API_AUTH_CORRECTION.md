@@ -165,3 +165,18 @@ rights just to run validation.
 * [HTTP API tagging endpoint](https://docs.aws.amazon.com/apigatewayv2/latest/api-reference/tags-resource-arn.html)
 * [Cognito public authorization reference](https://servicereference.us-east-1.amazonaws.com/v1/cognito-idp/cognito-idp.json)
 * [Access Analyzer ValidatePolicy](https://docs.aws.amazon.com/access-analyzer/latest/APIReference/API_ValidatePolicy.html)
+
+## 12 October 2026 — tagging ARN reinstated after a live denial
+
+A live CloudFormation create was denied `apigateway:POST` on
+`arn:aws:apigateway:ap-southeast-2::/tags/arn%3Aaws%3Aapigateway%3Aap-southeast-2%3A%3A%2Fv2%2Fapis%2F*`
+while creating the SAM HttpApi (SAM adds the `httpapi:createdBy` tag on create).
+This overrides the removal above: HTTP API tagging *is* authorized on the `/tags/`
+resource wrapping the URL-encoded `/v2/apis` ARN. New statements grant only
+GET/POST/DELETE (GetTags/TagResource/UntagResource):
+
+- Bootstrap `ManageInitiallyUnknownHttpApiTags`: encoded `.../v2/apis/*` (matches the literal `*` used before the ID exists).
+- Steady state `ManageKnownHttpApiTags`: encoded `.../v2/apis/<id>` and `.../v2/apis/<id>/*` (stage).
+
+`apigateway-v2-reference.json` gained a `Tags` type limited to encoded V2 API ARNs;
+REST `/restapis` or unencoded tag ARNs and PUT remain rejected by the validator.

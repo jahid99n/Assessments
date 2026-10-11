@@ -33,6 +33,26 @@
       }
     },
     {
+      "Sid": "ManageLatestEventInvokeConfigs",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:PutFunctionEventInvokeConfig",
+        "lambda:GetFunctionEventInvokeConfig",
+        "lambda:UpdateFunctionEventInvokeConfig",
+        "lambda:DeleteFunctionEventInvokeConfig"
+      ],
+      "Resource": [
+        "arn:aws:lambda:ap-southeast-2:296280725059:function:smart-expense-expense-api:$LATEST",
+        "arn:aws:lambda:ap-southeast-2:296280725059:function:smart-expense-receipt-processor:$LATEST",
+        "arn:aws:lambda:ap-southeast-2:296280725059:function:smart-expense-weekly-summary:$LATEST"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-2"
+        }
+      }
+    },
+    {
       "Sid": "OnlyApiGatewayAndS3InvocationGrants",
       "Effect": "Allow",
       "Action": ["lambda:AddPermission"],
@@ -76,6 +96,17 @@
         "scheduler:DeleteSchedule"
       ],
       "Resource": "arn:aws:scheduler:ap-southeast-2:296280725059:schedule/ict5205-expenses-ScheduleGroup-*/ict5205-expenses-WeeklySchedule-*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-2"
+        }
+      }
+    },
+    {
+      "Sid": "DeleteSchedulesInApplicationGroup",
+      "Effect": "Allow",
+      "Action": ["scheduler:DeleteSchedule"],
+      "Resource": "arn:aws:scheduler:ap-southeast-2:296280725059:schedule/ict5205-expenses-ScheduleGroup-*/*",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"

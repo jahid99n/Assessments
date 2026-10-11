@@ -98,6 +98,17 @@
       }
     },
     {
+      "Sid": "HeadArtifactBucket",
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": "arn:aws:s3:::smart-expense-296280725059-ap-southeast-2-artifacts",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-2"
+        }
+      }
+    },
+    {
       "Sid": "ListArtifactPrefix",
       "Effect": "Allow",
       "Action": ["s3:ListBucket"],

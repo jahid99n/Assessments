@@ -46,8 +46,14 @@ def parse(result):
     total_kind = "TOTAL" if value("TOTAL") else "AMOUNT_PAID"
     total = receipt_money(value(total_kind))
     detected_currency = fields.get(total_kind, {}).get("Currency", {}).get("Code") or value("CURRENCY")
+    source = "detected" if detected_currency else "application_default"
+    # Textract infers USD for a bare "$", which is how Australian receipts print
+    # dollars. Only an explicit foreign marker in the receipt text is rejected.
+    explicit = " ".join(filter(None, (value(total_kind), value("CURRENCY")))).upper()
+    if detected_currency and detected_currency.upper() == "USD" and not re.search(r"USD|US\$", explicit):
+        detected_currency, source = "AUD", "assumed_from_dollar_sign"
     currency = validation.currency(detected_currency.upper() if detected_currency else "AUD")
-    item = {"merchant": merchant, "receiptDate": date, "total": total, "currency": currency, "currencySource": "detected" if detected_currency else "application_default", "category": classify(merchant)}
+    item = {"merchant": merchant, "receiptDate": date, "total": total, "currency": currency, "currencySource": source, "category": classify(merchant)}
     if value("TAX"):
         item["gst"] = receipt_money(value("TAX"))
         if item["gst"] > total:

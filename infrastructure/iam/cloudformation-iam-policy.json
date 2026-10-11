@@ -13,7 +13,7 @@
       "Resource": "arn:aws:iam::296280725059:role/ict5205-expenses-ApiRole-*",
       "Condition": {
         "ArnEquals": {
-          "iam:PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-ApiRole-Boundary"
+          "iam:PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-BoundaryApiRole"
         }
       }
     },
@@ -29,7 +29,7 @@
       "Resource": "arn:aws:iam::296280725059:role/ict5205-expenses-ProcessorRole-*",
       "Condition": {
         "ArnEquals": {
-          "iam:PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-ProcessorRole-Boundary"
+          "iam:PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-BoundaryProcessorRole"
         }
       }
     },
@@ -45,7 +45,7 @@
       "Resource": "arn:aws:iam::296280725059:role/ict5205-expenses-SummaryRole-*",
       "Condition": {
         "ArnEquals": {
-          "iam:PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-SummaryRole-Boundary"
+          "iam:PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-BoundarySummaryRole"
         }
       }
     },
@@ -61,7 +61,7 @@
       "Resource": "arn:aws:iam::296280725059:role/ict5205-expenses-SchedulerRole-*",
       "Condition": {
         "ArnEquals": {
-          "iam:PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-SchedulerRole-Boundary"
+          "iam:PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-BoundarySchedulerRole"
         }
       }
     },

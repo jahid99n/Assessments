@@ -41,8 +41,21 @@ def test_amount_paid_fallback(textract_result):
     assert parse(textract_result)["total"] == Decimal("40.00")
 
 
-def test_foreign_currency_rejected(textract_result):
+def test_bare_dollar_inferred_as_usd_is_treated_as_aud(textract_result):
+    # Live Textract tags "$12.34" on an Australian receipt as USD.
     textract_result["ExpenseDocuments"][0]["SummaryFields"][2]["Currency"] = {"Code": "USD", "Confidence": 99}
+    item = parse(textract_result)
+    assert item["currency"] == "AUD" and item["currencySource"] == "assumed_from_dollar_sign"
+
+
+@pytest.mark.parametrize("code,total,currency_text", [
+    ("USD", "$40.00", "USD"), ("USD", "$40.00", "US$"), ("EUR", "$40.00", None), ("GBP", "40.00", None)])
+def test_explicit_foreign_currency_rejected(textract_result, code, total, currency_text):
+    fields = textract_result["ExpenseDocuments"][0]["SummaryFields"]
+    fields[2]["Currency"] = {"Code": code, "Confidence": 99}
+    fields[2]["ValueDetection"]["Text"] = total
+    if currency_text:
+        fields.append({"Type": {"Text": "CURRENCY", "Confidence": 99.0}, "ValueDetection": {"Text": currency_text, "Confidence": 97.5}})
     with pytest.raises(Problem, match="AUD"):
         parse(textract_result)
 

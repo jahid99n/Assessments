@@ -6,13 +6,7 @@
     "https://docs.aws.amazon.com/service-authorization/latest/reference/list_apigateway.html"
   ],
   "actions": {
-    "DELETE": [
-      "Api",
-      "Authorizer",
-      "Integration",
-      "Route",
-      "Stage"
-    ],
+    "DELETE": ["Api", "Authorizer", "Integration", "Route", "Stage", "Tags"],
     "GET": [
       "Api",
       "Apis",
@@ -23,34 +17,18 @@
       "Route",
       "Routes",
       "Stage",
-      "Stages"
+      "Stages",
+      "Tags"
     ],
-    "PATCH": [
-      "Api",
-      "Authorizer",
-      "Integration",
-      "Route",
-      "Stage"
-    ],
-    "POST": [
-      "Apis",
-      "Authorizers",
-      "Integrations",
-      "Routes",
-      "Stages"
-    ],
-    "PUT": [
-      "Api",
-      "Apis"
-    ]
+    "PATCH": ["Api", "Authorizer", "Integration", "Route", "Stage"],
+    "POST": ["Apis", "Authorizers", "Integrations", "Routes", "Stages", "Tags"],
+    "PUT": ["Api", "Apis"],
+    "TagResource": ["Stage", "Stages"],
+    "UntagResource": ["Stage", "Stages"]
   },
   "resources": {
-    "Api": [
-      "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}"
-    ],
-    "Apis": [
-      "arn:${Partition}:apigateway:${Region}::/apis"
-    ],
+    "Api": ["arn:${Partition}:apigateway:${Region}::/apis/${ApiId}"],
+    "Apis": ["arn:${Partition}:apigateway:${Region}::/apis"],
     "Authorizer": [
       "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/authorizers/${AuthorizerId}"
     ],
@@ -66,14 +44,15 @@
     "Route": [
       "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/routes/${RouteId}"
     ],
-    "Routes": [
-      "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/routes"
-    ],
+    "Routes": ["arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/routes"],
     "Stage": [
       "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/stages/${StageName}"
     ],
-    "Stages": [
-      "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/stages"
+    "Stages": ["arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/stages"],
+    "Tags": [
+      "arn:${Partition}:apigateway:${Region}::/tags/arn%3A${Partition}%3Aapigateway%3A${Region}%3A%3A%2Fv2%2Fapis%2F${EncodedApiSuffix}"
     ]
-  }
+  },
+  "tagsNote": "Tags is not in the V2 SAR table. It was added on 2026-10-12 after a live CloudFormation denial of apigateway:POST on /tags/<URL-encoded /v2/apis ARN> during SAM HttpApi tag-on-create. Only encoded V2 API ARNs (and their children) are accepted.",
+  "stageTagNote": "Not in the public reference snapshot; confirmed by a live ApiGatewayV2 Stage CloudFormation denial on 2026-10-12."
 }

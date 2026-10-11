@@ -50,6 +50,34 @@
       }
     },
     {
+      "Sid": "ManageKnownHttpApiTags",
+      "Effect": "Allow",
+      "Action": ["apigateway:GET", "apigateway:POST", "apigateway:DELETE"],
+      "Resource": [
+        "arn:aws:apigateway:ap-southeast-2::/tags/arn%3Aaws%3Aapigateway%3Aap-southeast-2%3A%3A%2Fv2%2Fapis%2FREVIEW_API_ID",
+        "arn:aws:apigateway:ap-southeast-2::/tags/arn%3Aaws%3Aapigateway%3Aap-southeast-2%3A%3A%2Fv2%2Fapis%2FREVIEW_API_ID%2F*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-2"
+        }
+      }
+    },
+    {
+      "Sid": "ManageKnownHttpApiStageTags",
+      "Effect": "Allow",
+      "Action": ["apigateway:TagResource", "apigateway:UntagResource"],
+      "Resource": [
+        "arn:aws:apigateway:ap-southeast-2::/apis/REVIEW_API_ID/stages",
+        "arn:aws:apigateway:ap-southeast-2::/apis/REVIEW_API_ID/stages/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-2"
+        }
+      }
+    },
+    {
       "Sid": "ManageKnownUserPool",
       "Effect": "Allow",
       "Action": [

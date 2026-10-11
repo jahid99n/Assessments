@@ -244,6 +244,22 @@
             "aws:RequestTag/${TagKey}",
             "aws:TagKeys"
           ]
+        },
+        "TagResource": {
+          "resources": [
+            "Stages",
+            "Stage"
+          ],
+          "conditionKeys": [],
+          "note": "Not in the public reference snapshot; confirmed by a live ApiGatewayV2 Stage CloudFormation denial on 2026-10-12."
+        },
+        "UntagResource": {
+          "resources": [
+            "Stages",
+            "Stage"
+          ],
+          "conditionKeys": [],
+          "note": "Not in the public reference snapshot; confirmed by a live ApiGatewayV2 Stage CloudFormation denial on 2026-10-12."
         }
       }
     },

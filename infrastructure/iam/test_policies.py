@@ -32,7 +32,7 @@ def test_all_checked_in_policies_pass_offline_validation():
 @pytest.mark.parametrize("name", ROLES)
 def test_each_runtime_role_requires_its_own_boundary(name):
     s = next(s for s in statements("cloudformation-iam-policy.json") if s["Sid"] == f"CreateBounded{name}")
-    expected = f"arn:aws:iam::{ACCOUNT}:policy/ExpenseTracker-{name}-Boundary"
+    expected = f"arn:aws:iam::{ACCOUNT}:policy/ExpenseTracker-Boundary{name}"
     assert s["Condition"]["ArnEquals"]["iam:PermissionsBoundary"] == expected
     assert s["Resource"] == f"arn:aws:iam::{ACCOUNT}:role/ict5205-expenses-{name}-*"
     assert DOCS["template.with-boundaries.json"]["Resources"][name]["Properties"]["PermissionsBoundary"] == expected
@@ -53,7 +53,8 @@ def test_inline_policy_and_trust_changes_require_existing_boundary():
         grants = [s for s in statements("cloudformation-iam-policy.json") if action in s["Action"]]
         assert len(grants) == 4
         for s in grants:
-            assert s["Condition"]["ArnEquals"]["iam:PermissionsBoundary"].endswith("-Boundary")
+            boundary = s["Condition"]["ArnEquals"]["iam:PermissionsBoundary"]
+            assert boundary.split(":policy/")[1] in {f"ExpenseTracker-Boundary{n}" for n in ROLES}
 
 
 @pytest.mark.parametrize("sid,service", [("PassLambdaRoles", "lambda.amazonaws.com"),
@@ -71,6 +72,23 @@ def test_deployer_can_pass_only_execution_role_and_cannot_administer_resources()
     assert s["Resource"] == f"arn:aws:iam::{ACCOUNT}:role/ExpenseTracker-CloudFormationExecution"
     assert s["Condition"]["StringEquals"]["iam:PassedToService"] == "cloudformation.amazonaws.com"
     assert "receipts" not in json.dumps(DOCS["deployment-user-policy.json"])
+
+
+def test_head_bucket_list_is_exact_artifact_bucket_and_prefix_listing_preserved():
+    bucket = f"arn:aws:s3:::smart-expense-{ACCOUNT}-ap-southeast-2-artifacts"
+    lists = {s["Sid"]: s for s in statements("deployment-user-policy.json") if "s3:ListBucket" in s["Action"]}
+    assert set(lists) == {"HeadArtifactBucket", "ListArtifactPrefix"}
+    head = lists["HeadArtifactBucket"]
+    # HeadBucket sends no s3:prefix, so this statement must not depend on one.
+    assert head["Action"] == ["s3:ListBucket"] and head["Resource"] == bucket
+    assert head["Condition"] == {"StringEquals": {"aws:RequestedRegion": "ap-southeast-2"}}
+    prefix = lists["ListArtifactPrefix"]
+    assert prefix["Resource"] == bucket
+    assert prefix["Condition"]["StringLike"]["s3:prefix"] == ["ict5205-expenses", "ict5205-expenses/*"]
+    object_grant = next(s for s in statements("deployment-user-policy.json") if s["Sid"] == "ManageDeploymentArtifacts")
+    assert object_grant["Resource"] == f"{bucket}/ict5205-expenses/*"
+    assert not any(a in {"s3:*", "s3:ListAllMyBuckets"} or a.startswith("s3:PutBucket")
+                   for a in actions("deployment-user-policy.json"))
 
 
 def test_role_parameter_required_for_changesets_delete_and_recovery():
@@ -105,6 +123,8 @@ def test_every_api_gateway_action_resource_pair_matches_v2_reference(filename):
     ("PUT", "/apis/REVIEW_API_ID/stages/$default"),
     ("PATCH", "/apis/REVIEW_API_ID/routes"),
     ("GET", "/tags/arn%3Aaws%3Aapigateway%3Aap-southeast-2%3A%3A%2Fapis%2FREVIEW_API_ID"),
+    ("POST", "/tags/arn%3Aaws%3Aapigateway%3Aap-southeast-2%3A%3A%2Frestapis%2F*"),
+    ("PUT", "/tags/arn%3Aaws%3Aapigateway%3Aap-southeast-2%3A%3A%2Fv2%2Fapis%2F*"),
     ("CreateApi", "/apis"),
     ("TagResource", "/apis/REVIEW_API_ID"),
 ])
@@ -126,11 +146,40 @@ def test_default_placeholders_and_cognito_scopes_are_preserved():
     assert reference["DescribeUserPoolDomain"]["resources"] == []
 
 
-def test_bootstrap_pool_creation_and_management_require_stack_tag():
-    for sid, key in [("CreateTaggedUserPool", "aws:RequestTag/Deployment"),
-                     ("ManageInitiallyUnknownUserPool", "aws:ResourceTag/Deployment")]:
-        s = next(s for s in statements("temporary-first-deployment-policy.json") if s["Sid"] == sid)
-        assert s["Condition"]["StringEquals"][key] == "ict5205-expenses"
+def test_bootstrap_pool_creation_is_sydney_only_and_management_requires_stack_tag():
+    bootstrap = statements("temporary-first-deployment-policy.json")
+    create = [s for s in bootstrap if "cognito-idp:CreateUserPool" in s["Action"]]
+    assert len(create) == 1 and create[0]["Sid"] == "CreateUserPoolInSydney"
+    # No resource type exists for CreateUserPool, so "*" is the only applicable Resource.
+    assert create[0]["Action"] == ["cognito-idp:CreateUserPool"] and create[0]["Resource"] == "*"
+    assert create[0]["Condition"] == {"StringEquals": {"aws:RequestedRegion": "ap-southeast-2"}}
+    reference = json.loads((HERE / "action-reference.json").read_text())["services"]["cognito-idp"]["actions"]
+    assert reference["CreateUserPool"]["resources"] == []
+    manage = next(s for s in bootstrap if s["Sid"] == "ManageInitiallyUnknownUserPool")
+    assert manage["Resource"] == f"arn:aws:cognito-idp:ap-southeast-2:{ACCOUNT}:userpool/*"
+    assert manage["Condition"]["StringEquals"]["aws:ResourceTag/Deployment"] == "ict5205-expenses"
+    assert "cognito-idp:CreateUserPool" not in manage["Action"]
+    for name in DOCS:
+        if name != "temporary-first-deployment-policy.json" and name.endswith("policy.json"):
+            assert "cognito-idp:CreateUserPool" not in actions(name)
+
+
+def test_schedule_deletion_is_limited_to_application_schedule_groups():
+    compute = statements("cloudformation-compute-policy.json")
+    group_delete = next(s for s in compute if s["Sid"] == "DeleteSchedulesInApplicationGroup")
+    assert group_delete["Action"] == ["scheduler:DeleteSchedule"]
+    # The ScheduleGroup delete/rollback handler authorizes against schedule/<group>/*.
+    assert group_delete["Resource"] == (
+        f"arn:aws:scheduler:ap-southeast-2:{ACCOUNT}:schedule/ict5205-expenses-ScheduleGroup-*/*")
+    assert group_delete["Condition"] == {"StringEquals": {"aws:RequestedRegion": "ap-southeast-2"}}
+    reference = json.loads((HERE / "action-reference.json").read_text())["services"]["scheduler"]["actions"]
+    assert reference["DeleteSchedule"]["resources"] == ["schedule"]
+    weekly = next(s for s in compute if s["Sid"] == "ManageWeeklySchedule")
+    assert weekly["Resource"].endswith("schedule/ict5205-expenses-ScheduleGroup-*/ict5205-expenses-WeeklySchedule-*")
+    for s in compute:
+        if any(a.startswith("scheduler:") for a in s["Action"]):
+            assert "scheduler:*" not in s["Action"]
+            assert ":schedule/*" not in json.dumps(s["Resource"]) and ":schedule-group/*" not in json.dumps(s["Resource"])
 
 
 def test_execution_policies_have_no_expense_data_plane_or_notification_send():
@@ -159,8 +208,14 @@ def test_candidate_only_adds_documented_controls():
     assert not errors
     candidate = copy.deepcopy(DOCS["template.with-boundaries.json"])
     for name in ROLES:
-        candidate["Resources"][name]["Properties"].pop("PermissionsBoundary")
-    candidate["Resources"]["Users"]["Properties"].pop("UserPoolTags")
+        # The source resolves the account at deploy time; the candidate renders it literally.
+        assert source["Resources"][name]["Properties"]["PermissionsBoundary"] == {
+            "Fn::Sub": f"arn:${{AWS::Partition}}:iam::${{AWS::AccountId}}:policy/ExpenseTracker-Boundary{name}"}
+        assert candidate["Resources"][name]["Properties"]["PermissionsBoundary"] == (
+            f"arn:aws:iam::{ACCOUNT}:policy/ExpenseTracker-Boundary{name}")
+        candidate["Resources"][name]["Properties"]["PermissionsBoundary"] = (
+            source["Resources"][name]["Properties"]["PermissionsBoundary"])
+    assert source["Resources"]["Users"]["Properties"]["UserPoolTags"] == {"Deployment": "ict5205-expenses"}
     candidate["Parameters"]["ProjectName"].pop("AllowedValues")
     candidate["Globals"]["Function"]["CodeUri"] = source["Globals"]["Function"]["CodeUri"]
     assert candidate == source
@@ -210,4 +265,49 @@ def test_sam_expansion_offline_preserves_resource_count_and_boundaries(monkeypat
     assert len(expanded["Resources"]) == 44
     assert not any(r["Type"] == "AWS::CloudFormation::Stack" for r in expanded["Resources"].values())
     for name in ROLES:
-        assert expanded["Resources"][name]["Properties"]["PermissionsBoundary"].endswith(f"ExpenseTracker-{name}-Boundary")
+        assert expanded["Resources"][name]["Properties"]["PermissionsBoundary"].endswith(f"ExpenseTracker-Boundary{name}")
+
+
+def test_event_invoke_configs_use_exact_latest_qualified_function_arns():
+    compute = statements("cloudformation-compute-policy.json")
+    latest = next(s for s in compute if s["Sid"] == "ManageLatestEventInvokeConfigs")
+    assert set(latest["Action"]) == {f"lambda:{verb}FunctionEventInvokeConfig" for verb in ("Put", "Get", "Update", "Delete")}
+    assert latest["Resource"] == [f"arn:aws:lambda:ap-southeast-2:{ACCOUNT}:function:smart-expense-{name}:$LATEST"
+                                  for name in ("expense-api", "receipt-processor", "weekly-summary")]
+    # No other Lambda action is granted on qualified ARNs.
+    for s in compute:
+        if s["Sid"] != "ManageLatestEventInvokeConfigs":
+            assert ":$LATEST" not in json.dumps(s["Resource"])
+
+
+@pytest.mark.parametrize("filename,sid,targets", [
+    ("temporary-first-deployment-policy.json", "ManageInitiallyUnknownHttpApiTags", ["*"]),
+    ("cloudformation-api-auth-policy.json", "ManageKnownHttpApiTags", ["abc123", "abc123%2F*"]),
+])
+def test_http_api_tagging_scoped_to_encoded_v2_api_arns(filename, sid, targets):
+    s = next(s for s in statements(filename) if s["Sid"] == sid)
+    assert s["Action"] == ["apigateway:GET", "apigateway:POST", "apigateway:DELETE"]
+    prefix = "arn:aws:apigateway:ap-southeast-2::/tags/arn%3Aaws%3Aapigateway%3Aap-southeast-2%3A%3A%2Fv2%2Fapis%2F"
+    assert s["Resource"] == [prefix + t for t in targets]
+    # The exact resource from the confirmed denial must match the bootstrap pattern.
+    if filename.startswith("temporary"):
+        import fnmatch
+        denied = prefix + "*"
+        assert fnmatch.fnmatchcase(denied, s["Resource"][0])
+
+
+@pytest.mark.parametrize("filename,sid,api", [
+    ("temporary-first-deployment-policy.json", "ManageInitiallyUnknownHttpApiStageTags", "*"),
+    ("cloudformation-api-auth-policy.json", "ManageKnownHttpApiStageTags", "abc123"),
+])
+def test_stage_tagging_limited_to_stage_resources(filename, sid, api):
+    s = next(s for s in statements(filename) if s["Sid"] == sid)
+    assert s["Action"] == ["apigateway:TagResource", "apigateway:UntagResource"]
+    base = f"arn:aws:apigateway:ap-southeast-2::/apis/{api}/stages"
+    assert s["Resource"] == [base, base + "/*"]
+    # The exact resource from the confirmed denial must match.
+    if api == "*":
+        import fnmatch
+        assert fnmatch.fnmatchcase("arn:aws:apigateway:ap-southeast-2::/apis/l8g98iqp57/stages", s["Resource"][0])
+    tagging = [x for x in statements(filename) if "apigateway:TagResource" in x["Action"]]
+    assert tagging == [s]

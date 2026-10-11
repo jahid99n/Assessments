@@ -61,14 +61,40 @@
       }
     },
     {
-      "Sid": "CreateTaggedUserPool",
+      "Sid": "ManageInitiallyUnknownHttpApiTags",
+      "Effect": "Allow",
+      "Action": ["apigateway:GET", "apigateway:POST", "apigateway:DELETE"],
+      "Resource": [
+        "arn:aws:apigateway:ap-southeast-2::/tags/arn%3Aaws%3Aapigateway%3Aap-southeast-2%3A%3A%2Fv2%2Fapis%2F*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-2"
+        }
+      }
+    },
+    {
+      "Sid": "ManageInitiallyUnknownHttpApiStageTags",
+      "Effect": "Allow",
+      "Action": ["apigateway:TagResource", "apigateway:UntagResource"],
+      "Resource": [
+        "arn:aws:apigateway:ap-southeast-2::/apis/*/stages",
+        "arn:aws:apigateway:ap-southeast-2::/apis/*/stages/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-2"
+        }
+      }
+    },
+    {
+      "Sid": "CreateUserPoolInSydney",
       "Effect": "Allow",
       "Action": ["cognito-idp:CreateUserPool"],
       "Resource": "*",
       "Condition": {
         "StringEquals": {
-          "aws:RequestedRegion": "ap-southeast-2",
-          "aws:RequestTag/Deployment": "ict5205-expenses"
+          "aws:RequestedRegion": "ap-southeast-2"
         }
       }
     },
