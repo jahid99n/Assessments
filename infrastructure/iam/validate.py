@@ -4,9 +4,31 @@ Not AWS Access Analyzer, an IAM simulator, or proof of deployment permissions.
 """
 import argparse
 import json
+import re
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+
+
+def validate_http_api_pair(action, resource):
+    """Check each pair against the project's supported V2 SAR resource types.
+
+    Wildcards in identifiers remain patterns, not evidence of resource ownership.
+    This deliberately rejects REST tagging resources for this HTTP-only template.
+    """
+    reference = json.loads((HERE / "apigateway-v2-reference.json").read_text(encoding="utf-8"))
+    verb = action.split(":", 1)[1]
+    for resource_type in reference["actions"].get(verb, []):
+        for fmt in reference["resources"][resource_type]:
+            parts = re.split(r"(\$\{[^}]+\})", fmt)
+            pattern = "".join(
+                "aws" if part == "${Partition}" else
+                "ap-southeast-2" if part == "${Region}" else
+                "[^/]+" if part.startswith("${") else re.escape(part)
+                for part in parts)
+            if re.fullmatch(pattern, resource):
+                return
+    raise AssertionError(f"Unsupported HTTP API action/resource pair: {action} on {resource}")
 
 
 def reject_duplicates(pairs):
@@ -23,7 +45,7 @@ def validate(folder):
     checked = {}
     for path in sorted(folder.glob("*.json")):
         doc = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=reject_duplicates)
-        if path.name in {"template.with-boundaries.json", "action-reference.json", "validation-results.json"} or path.name.startswith("."):
+        if path.name in {"template.with-boundaries.json", "action-reference.json", "apigateway-v2-reference.json", "validation-results.json"} or path.name.startswith("."):
             continue
         assert doc["Version"] == "2012-10-17", path.name
         assert set(doc) == {"Version", "Statement"}, path.name
@@ -49,6 +71,9 @@ def validate(folder):
                 assert "*" not in action, (path.name, "Wildcard action", action)
                 service, name = action.split(":", 1)
                 assert name in reference["services"][service]["actions"], (path.name, "Unknown action", action)
+                if service == "apigateway":
+                    for resource in resources:
+                        validate_http_api_pair(action, resource)
                 if s["Effect"] == "Allow" and service != "iam":
                     assert s.get("Condition", {}).get("StringEquals", {}).get("aws:RequestedRegion") == "ap-southeast-2", (path.name, action)
         assert len(sids) == len(set(sids)), (path.name, "Duplicate Sid")

@@ -4,10 +4,7 @@
     {
       "Sid": "CreateHttpApi",
       "Effect": "Allow",
-      "Action": [
-        "apigateway:POST",
-        "apigateway:PUT"
-      ],
+      "Action": ["apigateway:POST", "apigateway:PUT"],
       "Resource": "arn:aws:apigateway:ap-southeast-2::/apis",
       "Condition": {
         "StringEquals": {
@@ -20,7 +17,6 @@
       "Effect": "Allow",
       "Action": [
         "apigateway:GET",
-        "apigateway:POST",
         "apigateway:PUT",
         "apigateway:PATCH",
         "apigateway:DELETE"
@@ -33,14 +29,31 @@
       }
     },
     {
-      "Sid": "TagInitiallyUnknownHttpApi",
+      "Sid": "ManageInitiallyUnknownHttpApiCollections",
       "Effect": "Allow",
-      "Action": [
-        "apigateway:GET",
-        "apigateway:PUT",
-        "apigateway:DELETE"
+      "Action": ["apigateway:GET", "apigateway:POST"],
+      "Resource": [
+        "arn:aws:apigateway:ap-southeast-2::/apis/*/authorizers",
+        "arn:aws:apigateway:ap-southeast-2::/apis/*/integrations",
+        "arn:aws:apigateway:ap-southeast-2::/apis/*/routes",
+        "arn:aws:apigateway:ap-southeast-2::/apis/*/stages"
       ],
-      "Resource": "arn:aws:apigateway:ap-southeast-2::/tags/arn%3Aaws%3Aapigateway%3Aap-southeast-2%3A%3A%2Fapis%2F*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-2"
+        }
+      }
+    },
+    {
+      "Sid": "ManageInitiallyUnknownHttpApiChildren",
+      "Effect": "Allow",
+      "Action": ["apigateway:GET", "apigateway:PATCH", "apigateway:DELETE"],
+      "Resource": [
+        "arn:aws:apigateway:ap-southeast-2::/apis/*/authorizers/*",
+        "arn:aws:apigateway:ap-southeast-2::/apis/*/integrations/*",
+        "arn:aws:apigateway:ap-southeast-2::/apis/*/routes/*",
+        "arn:aws:apigateway:ap-southeast-2::/apis/*/stages/*"
+      ],
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -50,9 +63,7 @@
     {
       "Sid": "CreateTaggedUserPool",
       "Effect": "Allow",
-      "Action": [
-        "cognito-idp:CreateUserPool"
-      ],
+      "Action": ["cognito-idp:CreateUserPool"],
       "Resource": "*",
       "Condition": {
         "StringEquals": {
@@ -86,7 +97,7 @@
         "cognito-idp:UntagResource",
         "cognito-idp:ListTagsForResource"
       ],
-      "Resource": "arn:aws:cognito-idp:ap-southeast-2:111122223333:userpool/*",
+      "Resource": "arn:aws:cognito-idp:ap-southeast-2:296280725059:userpool/*",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2",
@@ -97,10 +108,8 @@
     {
       "Sid": "BootstrapApiGatewayServiceRole",
       "Effect": "Allow",
-      "Action": [
-        "iam:CreateServiceLinkedRole"
-      ],
-      "Resource": "arn:aws:iam::111122223333:role/aws-service-role/ops.apigateway.amazonaws.com/AWSServiceRoleForAPIGateway",
+      "Action": ["iam:CreateServiceLinkedRole"],
+      "Resource": "arn:aws:iam::296280725059:role/aws-service-role/ops.apigateway.amazonaws.com/AWSServiceRoleForAPIGateway",
       "Condition": {
         "StringEquals": {
           "iam:AWSServiceName": "ops.apigateway.amazonaws.com"

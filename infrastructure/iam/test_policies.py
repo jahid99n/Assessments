@@ -10,9 +10,9 @@ import pytest
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from prepare import generate, ROLES, ROOT
-from validate import validate, reject_duplicates
+from validate import validate, reject_duplicates, validate_http_api_pair
 
-ACCOUNT = "111122223333"
+ACCOUNT = "296280725059"
 DOCS = generate(ACCOUNT, "abc123", "ap-southeast-2_Example", "exampleapp")
 
 
@@ -91,6 +91,41 @@ def test_steady_state_auth_policy_uses_supplied_ids():
     assert "cognito-idp:CreateUserPool" not in actions("cloudformation-api-auth-policy.json")
 
 
+@pytest.mark.parametrize("filename", ["cloudformation-api-auth-policy.json", "temporary-first-deployment-policy.json"])
+def test_every_api_gateway_action_resource_pair_matches_v2_reference(filename):
+    for s in statements(filename):
+        for action in s["Action"]:
+            if action.startswith("apigateway:"):
+                for resource in s["Resource"] if isinstance(s["Resource"], list) else [s["Resource"]]:
+                    validate_http_api_pair(action, resource)
+
+
+@pytest.mark.parametrize("action,path", [
+    ("POST", "/apis/REVIEW_API_ID"),
+    ("PUT", "/apis/REVIEW_API_ID/stages/$default"),
+    ("PATCH", "/apis/REVIEW_API_ID/routes"),
+    ("GET", "/tags/arn%3Aaws%3Aapigateway%3Aap-southeast-2%3A%3A%2Fapis%2FREVIEW_API_ID"),
+    ("CreateApi", "/apis"),
+    ("TagResource", "/apis/REVIEW_API_ID"),
+])
+def test_inapplicable_pairs_and_invented_actions_are_rejected(action, path):
+    with pytest.raises(AssertionError):
+        validate_http_api_pair(f"apigateway:{action}", f"arn:aws:apigateway:ap-southeast-2::{path}")
+
+
+def test_default_placeholders_and_cognito_scopes_are_preserved():
+    document = generate(ACCOUNT)["cloudformation-api-auth-policy.json"]
+    assert "REVIEW_API_ID" in json.dumps(document)
+    pool = next(s for s in document["Statement"] if s["Sid"] == "ManageKnownUserPool")
+    assert pool["Resource"] == f"arn:aws:cognito-idp:ap-southeast-2:{ACCOUNT}:userpool/ap-southeast-2_REVIEW"
+    reference = json.loads((HERE / "action-reference.json").read_text())["services"]["cognito-idp"]["actions"]
+    for action in pool["Action"]:
+        assert reference[action.split(":")[1]]["resources"] == ["userpool"]
+    domain = next(s for s in document["Statement"] if s["Sid"] == "ReadCognitoDomain")
+    assert domain["Resource"] == "*"
+    assert reference["DescribeUserPoolDomain"]["resources"] == []
+
+
 def test_bootstrap_pool_creation_and_management_require_stack_tag():
     for sid, key in [("CreateTaggedUserPool", "aws:RequestTag/Deployment"),
                      ("ManageInitiallyUnknownUserPool", "aws:ResourceTag/Deployment")]:
@@ -131,7 +166,7 @@ def test_candidate_only_adds_documented_controls():
     assert candidate == source
 
 
-@pytest.mark.parametrize("account", ["123", "*", "111122223333:role/admin"])
+@pytest.mark.parametrize("account", ["123", "*", "296280725059:role/admin"])
 def test_invalid_account_id_rejected(account):
     with pytest.raises(ValueError):
         generate(account)

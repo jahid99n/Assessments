@@ -7,9 +7,7 @@
       "Type": "String",
       "Default": "smart-expense",
       "AllowedPattern": "[a-z][a-z0-9-]{2,24}",
-      "AllowedValues": [
-        "smart-expense"
-      ]
+      "AllowedValues": ["smart-expense"]
     },
     "FrontendOrigin": {
       "Type": "String",
@@ -19,10 +17,7 @@
     "PrivateEmailEnabled": {
       "Type": "String",
       "Default": "false",
-      "AllowedValues": [
-        "false",
-        "true"
-      ],
+      "AllowedValues": ["false", "true"],
       "Description": "Enable only after the documented account/IAM and two-user isolation checks"
     }
   },
@@ -46,9 +41,7 @@
   "Globals": {
     "Function": {
       "Runtime": "python3.12",
-      "Architectures": [
-        "x86_64"
-      ],
+      "Architectures": ["x86_64"],
       "CodeUri": "../../code/backend/",
       "MemorySize": 256,
       "Timeout": 60,
@@ -148,10 +141,7 @@
             {
               "Event": "s3:ObjectCreated:*",
               "Function": {
-                "Fn::GetAtt": [
-                  "ProcessorFunction",
-                  "Arn"
-                ]
+                "Fn::GetAtt": ["ProcessorFunction", "Arn"]
               },
               "Filter": {
                 "S3Key": {
@@ -196,14 +186,8 @@
                   "Ref": "FrontendOrigin"
                 }
               ],
-              "AllowedMethods": [
-                "POST",
-                "GET",
-                "HEAD"
-              ],
-              "AllowedHeaders": [
-                "Content-Type"
-              ],
+              "AllowedMethods": ["POST", "GET", "HEAD"],
+              "AllowedHeaders": ["Content-Type"],
               "MaxAge": 300
             }
           ]
@@ -242,10 +226,7 @@
               "Action": "s3:*",
               "Resource": [
                 {
-                  "Fn::GetAtt": [
-                    "Receipts",
-                    "Arn"
-                  ]
+                  "Fn::GetAtt": ["Receipts", "Arn"]
                 },
                 {
                   "Fn::Sub": "${Receipts.Arn}/*"
@@ -270,12 +251,8 @@
           "Fn::Sub": "${ProjectName}-users"
         },
         "UserPoolTier": "ESSENTIALS",
-        "UsernameAttributes": [
-          "email"
-        ],
-        "AutoVerifiedAttributes": [
-          "email"
-        ],
+        "UsernameAttributes": ["email"],
+        "AutoVerifiedAttributes": ["email"],
         "UsernameConfiguration": {
           "CaseSensitive": false
         },
@@ -297,9 +274,7 @@
           ]
         },
         "UserAttributeUpdateSettings": {
-          "AttributesRequireVerificationBeforeUpdate": [
-            "email"
-          ]
+          "AttributesRequireVerificationBeforeUpdate": ["email"]
         },
         "UserPoolTags": {
           "Deployment": "ict5205-expenses"
@@ -314,17 +289,9 @@
         },
         "GenerateSecret": false,
         "AllowedOAuthFlowsUserPoolClient": true,
-        "AllowedOAuthFlows": [
-          "code"
-        ],
-        "AllowedOAuthScopes": [
-          "openid",
-          "email",
-          "profile"
-        ],
-        "SupportedIdentityProviders": [
-          "COGNITO"
-        ],
+        "AllowedOAuthFlows": ["code"],
+        "AllowedOAuthScopes": ["openid", "email", "profile"],
+        "SupportedIdentityProviders": ["COGNITO"],
         "CallbackURLs": [
           {
             "Fn::Sub": "${FrontendOrigin}/auth/callback"
@@ -402,22 +369,13 @@
                 "ArnNotEquals": {
                   "aws:PrincipalArn": [
                     {
-                      "Fn::GetAtt": [
-                        "ApiRole",
-                        "Arn"
-                      ]
+                      "Fn::GetAtt": ["ApiRole", "Arn"]
                     },
                     {
-                      "Fn::GetAtt": [
-                        "ProcessorRole",
-                        "Arn"
-                      ]
+                      "Fn::GetAtt": ["ProcessorRole", "Arn"]
                     },
                     {
-                      "Fn::GetAtt": [
-                        "SummaryRole",
-                        "Arn"
-                      ]
+                      "Fn::GetAtt": ["SummaryRole", "Arn"]
                     }
                   ]
                 }
@@ -434,10 +392,7 @@
               "Condition": {
                 "ArnNotEquals": {
                   "aws:PrincipalArn": {
-                    "Fn::GetAtt": [
-                      "ApiRole",
-                      "Arn"
-                    ]
+                    "Fn::GetAtt": ["ApiRole", "Arn"]
                   }
                 }
               }
@@ -474,17 +429,8 @@
               "Ref": "FrontendOrigin"
             }
           ],
-          "AllowHeaders": [
-            "Authorization",
-            "Content-Type"
-          ],
-          "AllowMethods": [
-            "GET",
-            "POST",
-            "PUT",
-            "DELETE",
-            "OPTIONS"
-          ],
+          "AllowHeaders": ["Authorization", "Content-Type"],
+          "AllowMethods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
           "MaxAge": 300
         },
         "DefaultRouteSettings": {
@@ -493,10 +439,7 @@
         },
         "AccessLogSettings": {
           "DestinationArn": {
-            "Fn::GetAtt": [
-              "ApiLogs",
-              "Arn"
-            ]
+            "Fn::GetAtt": ["ApiLogs", "Arn"]
           },
           "Format": "{\"requestId\":\"$context.requestId\",\"route\":\"$context.routeKey\",\"status\":\"$context.status\",\"integrationError\":\"$context.integrationErrorMessage\"}"
         }
@@ -511,10 +454,7 @@
         },
         "Handler": "expense_api.handler",
         "Role": {
-          "Fn::GetAtt": [
-            "ApiRole",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["ApiRole", "Arn"]
         },
         "Timeout": 29,
         "Events": {
@@ -629,10 +569,7 @@
         },
         "Handler": "receipt_processor.handler",
         "Role": {
-          "Fn::GetAtt": [
-            "ProcessorRole",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["ProcessorRole", "Arn"]
         },
         "EventInvokeConfig": {
           "MaximumEventAgeInSeconds": 21600,
@@ -665,10 +602,7 @@
         },
         "Handler": "weekly_summary.handler",
         "Role": {
-          "Fn::GetAtt": [
-            "SummaryRole",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["SummaryRole", "Arn"]
         },
         "EventInvokeConfig": {
           "MaximumEventAgeInSeconds": 21600,
@@ -705,10 +639,7 @@
                     "dynamodb:Query"
                   ],
                   "Resource": {
-                    "Fn::GetAtt": [
-                      "Expenses",
-                      "Arn"
-                    ]
+                    "Fn::GetAtt": ["Expenses", "Arn"]
                   }
                 },
                 {
@@ -719,10 +650,7 @@
                     "dynamodb:UpdateItem"
                   ],
                   "Resource": {
-                    "Fn::GetAtt": [
-                      "Budgets",
-                      "Arn"
-                    ]
+                    "Fn::GetAtt": ["Budgets", "Arn"]
                   }
                 },
                 {
@@ -738,10 +666,7 @@
                 },
                 {
                   "Effect": "Allow",
-                  "Action": [
-                    "sns:Subscribe",
-                    "sns:Unsubscribe"
-                  ],
+                  "Action": ["sns:Subscribe", "sns:Unsubscribe"],
                   "Resource": {
                     "Ref": "Alerts"
                   }
@@ -772,10 +697,7 @@
                 },
                 {
                   "Effect": "Allow",
-                  "Action": [
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents"
-                  ],
+                  "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
                   "Resource": {
                     "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProjectName}-expense-api:*"
                   }
@@ -784,7 +706,7 @@
             }
           }
         ],
-        "PermissionsBoundary": "arn:aws:iam::111122223333:policy/ExpenseTracker-ApiRole-Boundary"
+        "PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-ApiRole-Boundary"
       }
     },
     "ProcessorRole": {
@@ -816,10 +738,7 @@
                     "dynamodb:Query"
                   ],
                   "Resource": {
-                    "Fn::GetAtt": [
-                      "Expenses",
-                      "Arn"
-                    ]
+                    "Fn::GetAtt": ["Expenses", "Arn"]
                   }
                 },
                 {
@@ -830,10 +749,7 @@
                     "dynamodb:UpdateItem"
                   ],
                   "Resource": {
-                    "Fn::GetAtt": [
-                      "Budgets",
-                      "Arn"
-                    ]
+                    "Fn::GetAtt": ["Budgets", "Arn"]
                   }
                 },
                 {
@@ -849,10 +765,7 @@
                 },
                 {
                   "Effect": "Allow",
-                  "Action": [
-                    "s3:GetObjectVersion",
-                    "s3:DeleteObjectVersion"
-                  ],
+                  "Action": ["s3:GetObjectVersion", "s3:DeleteObjectVersion"],
                   "Resource": {
                     "Fn::Sub": "arn:${AWS::Partition}:s3:::${ProjectName}-${AWS::AccountId}-${AWS::Region}-receipts/receipts/*"
                   }
@@ -864,10 +777,7 @@
                 },
                 {
                   "Effect": "Allow",
-                  "Action": [
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents"
-                  ],
+                  "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
                   "Resource": {
                     "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProjectName}-receipt-processor:*"
                   }
@@ -876,7 +786,7 @@
             }
           }
         ],
-        "PermissionsBoundary": "arn:aws:iam::111122223333:policy/ExpenseTracker-ProcessorRole-Boundary"
+        "PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-ProcessorRole-Boundary"
       }
     },
     "SummaryRole": {
@@ -904,10 +814,7 @@
                   "Effect": "Allow",
                   "Action": "dynamodb:Query",
                   "Resource": {
-                    "Fn::GetAtt": [
-                      "Expenses",
-                      "Arn"
-                    ]
+                    "Fn::GetAtt": ["Expenses", "Arn"]
                   }
                 },
                 {
@@ -918,20 +825,14 @@
                     "dynamodb:UpdateItem"
                   ],
                   "Resource": {
-                    "Fn::GetAtt": [
-                      "Budgets",
-                      "Arn"
-                    ]
+                    "Fn::GetAtt": ["Budgets", "Arn"]
                   }
                 },
                 {
                   "Effect": "Allow",
                   "Action": "dynamodb:Scan",
                   "Resource": {
-                    "Fn::GetAtt": [
-                      "Budgets",
-                      "Arn"
-                    ]
+                    "Fn::GetAtt": ["Budgets", "Arn"]
                   }
                 },
                 {
@@ -947,10 +848,7 @@
                 },
                 {
                   "Effect": "Allow",
-                  "Action": [
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents"
-                  ],
+                  "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
                   "Resource": {
                     "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProjectName}-weekly-summary:*"
                   }
@@ -959,7 +857,7 @@
             }
           }
         ],
-        "PermissionsBoundary": "arn:aws:iam::111122223333:policy/ExpenseTracker-SummaryRole-Boundary"
+        "PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-SummaryRole-Boundary"
       }
     },
     "ScheduleGroup": {
@@ -985,10 +883,7 @@
                 },
                 "ArnEquals": {
                   "aws:SourceArn": {
-                    "Fn::GetAtt": [
-                      "ScheduleGroup",
-                      "Arn"
-                    ]
+                    "Fn::GetAtt": ["ScheduleGroup", "Arn"]
                   }
                 }
               }
@@ -1005,17 +900,14 @@
                   "Effect": "Allow",
                   "Action": "lambda:InvokeFunction",
                   "Resource": {
-                    "Fn::GetAtt": [
-                      "SummaryFunction",
-                      "Arn"
-                    ]
+                    "Fn::GetAtt": ["SummaryFunction", "Arn"]
                   }
                 }
               ]
             }
           }
         ],
-        "PermissionsBoundary": "arn:aws:iam::111122223333:policy/ExpenseTracker-SchedulerRole-Boundary"
+        "PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-SchedulerRole-Boundary"
       }
     },
     "WeeklySchedule": {
@@ -1032,16 +924,10 @@
         "State": "ENABLED",
         "Target": {
           "Arn": {
-            "Fn::GetAtt": [
-              "SummaryFunction",
-              "Arn"
-            ]
+            "Fn::GetAtt": ["SummaryFunction", "Arn"]
           },
           "RoleArn": {
-            "Fn::GetAtt": [
-              "SchedulerRole",
-              "Arn"
-            ]
+            "Fn::GetAtt": ["SchedulerRole", "Arn"]
           },
           "Input": "{\"scheduledTime\":\"<aws.scheduler.scheduled-time>\"}",
           "RetryPolicy": {

@@ -1,11 +1,16 @@
 # Proposed deployment IAM — review only
 
 Prepared 11 October 2026. **Nothing in this directory has been applied to AWS.**
-The checked-in policies use AWS's example account `111122223333`, API ID
+The checked-in policies use AWS's example account `296280725059`, API ID
 `REVIEW_API_ID`, user pool `ap-southeast-2_REVIEW`, and Amplify app `reviewapp`.
 They are syntactically valid review examples, **not policies to attach unchanged**.
 Generate account-specific copies before an administrator reviews and attaches them.
 Account IDs are not credentials; this generator never reads credentials or calls AWS.
+
+**API authorization correction:** see [API_AUTH_CORRECTION.md](API_AUTH_CORRECTION.md)
+for the corrected individual/collection action scopes, removal of REST tagging
+ARNs from the HTTP API policy, 33-test validation, and updating the existing
+`ExpenseTracker-CfnApiAuthPolicy`. This supersedes the earlier tag-ARN assumption.
 
 ## Recommended arrangement
 
@@ -49,17 +54,17 @@ expansion in `../../report/stage4-expanded-template.json`,
 `../../customHttp.yml` and `../amplify-rewrites.json`. No `samconfig` file or nested
 stack was found. SAM expands the application to **44 resources**:
 
-| Resources | Execution permissions and scope |
-|---|---|
+| Resources                                                                | Execution permissions and scope                                                                                                                                                                                                                         |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 3 Lambda functions, 10 invoke permissions, 2 async invoke configurations | Create/read/update/delete functions and configurations; tag functions; add/remove invoke permissions on the three exact function ARNs. New invocation grants only to API Gateway and S3. No direct InvokeFunction permission for deployment identities. |
-| 4 IAM runtime roles | Create only `ict5205-expenses-{ApiRole,ProcessorRole,SummaryRole,SchedulerRole}-*`, each with its corresponding boundary; manage inline policies/trust/tags; delete roles; pass only Lambda roles to Lambda and the scheduler role to Scheduler. |
-| 2 DynamoDB tables | Lifecycle, describe and tag operations on `ict5205-expenses-Expenses-*` and `ict5205-expenses-Budgets-*`; no expense read/write/query/scan permission for deployment identities. |
-| S3 bucket and bucket policy | Create/configure exact `smart-expense-ACCOUNT-ap-southeast-2-receipts`, including CORS, notifications, lifecycle, versioning, encryption, ownership, public-access block and TLS bucket policy; no receipt object access. |
-| Cognito pool, client, domain, managed-login branding | Pool configuration, client/domain/branding lifecycle, MFA configuration reads/writes and tags. Exact pool ARN after bootstrap. No administrative user-data APIs. |
-| SNS topic and topic policy | Lifecycle, attributes/policy and tags on `smart-expense-expense-alerts`; no publishing, subscribing or subscription changes by deployment identities. Runtime roles retain their existing SNS permissions. |
-| HTTP API and default stage | API Gateway GET/POST/PUT/PATCH/DELETE on the exact API and children after bootstrap; includes integrations, JWT authorizer, routes, stage and tags created from SAM's OpenAPI definition. |
-| Scheduler group and weekly schedule | Group/schedule lifecycle and tags on stack-generated name prefixes; only the application scheduler role can be passed. |
-| 4 log groups, 3 metric filters, 4 alarms | Lifecycle, retention, filters and tags on exact Lambda log groups and stack-generated API log/alarm names; separate regional account-level log-delivery operations. No log-content reading granted. |
+| 4 IAM runtime roles                                                      | Create only `ict5205-expenses-{ApiRole,ProcessorRole,SummaryRole,SchedulerRole}-*`, each with its corresponding boundary; manage inline policies/trust/tags; delete roles; pass only Lambda roles to Lambda and the scheduler role to Scheduler.        |
+| 2 DynamoDB tables                                                        | Lifecycle, describe and tag operations on `ict5205-expenses-Expenses-*` and `ict5205-expenses-Budgets-*`; no expense read/write/query/scan permission for deployment identities.                                                                        |
+| S3 bucket and bucket policy                                              | Create/configure exact `smart-expense-ACCOUNT-ap-southeast-2-receipts`, including CORS, notifications, lifecycle, versioning, encryption, ownership, public-access block and TLS bucket policy; no receipt object access.                               |
+| Cognito pool, client, domain, managed-login branding                     | Pool configuration, client/domain/branding lifecycle, MFA configuration reads/writes and tags. Exact pool ARN after bootstrap. No administrative user-data APIs.                                                                                        |
+| SNS topic and topic policy                                               | Lifecycle, attributes/policy and tags on `smart-expense-expense-alerts`; no publishing, subscribing or subscription changes by deployment identities. Runtime roles retain their existing SNS permissions.                                              |
+| HTTP API and default stage                                               | API Gateway GET/POST/PUT/PATCH/DELETE on the exact API and children after bootstrap; includes integrations, JWT authorizer, routes, stage and tags created from SAM's OpenAPI definition.                                                               |
+| Scheduler group and weekly schedule                                      | Group/schedule lifecycle and tags on stack-generated name prefixes; only the application scheduler role can be passed.                                                                                                                                  |
+| 4 log groups, 3 metric filters, 4 alarms                                 | Lifecycle, retention, filters and tags on exact Lambda log groups and stack-generated API log/alarm names; separate regional account-level log-delivery operations. No log-content reading granted.                                                     |
 
 The user policy additionally covers CloudFormation validation, changeset creation,
 inspection/execution/deletion, stack status/events/resources/template reads, update
@@ -89,20 +94,20 @@ or repository integration permission is needed for the documented manual ZIP pat
 All entries below are customer-managed permissions policies except the trust policy.
 Use these names exactly because the boundary and role ARNs are referenced in JSON.
 
-| File | AWS policy/role name | Attach where |
-|---|---|---|
-| `deployment-user-policy.json` | `ExpenseTracker-Deploy` | `ExpenseTracker-Deployers` group only |
-| `cloudformation-storage-policy.json` | `ExpenseTracker-CfnStorage` | Execution role |
-| `cloudformation-compute-policy.json` | `ExpenseTracker-CfnCompute` | Execution role |
-| `cloudformation-api-auth-policy.json` | `ExpenseTracker-CfnApiAuth` | Execution role |
-| `cloudformation-iam-policy.json` | `ExpenseTracker-CfnIam` | Execution role |
-| `temporary-first-deployment-policy.json` | `ExpenseTracker-CfnBootstrap` | Execution role temporarily, never the user/group |
-| `boundary-ApiRole.json` | `ExpenseTracker-ApiRole-Boundary` | Permissions boundary on ApiRole, applied by candidate template |
-| `boundary-ProcessorRole.json` | `ExpenseTracker-ProcessorRole-Boundary` | Permissions boundary on ProcessorRole |
-| `boundary-SummaryRole.json` | `ExpenseTracker-SummaryRole-Boundary` | Permissions boundary on SummaryRole |
-| `boundary-SchedulerRole.json` | `ExpenseTracker-SchedulerRole-Boundary` | Permissions boundary on SchedulerRole |
-| `cloudformation-trust-policy.json` | Trust for `ExpenseTracker-CloudFormationExecution` | Role's trust relationship, not a permissions policy |
-| `optional-amplify-deployer-policy.json` | `ExpenseTracker-DeployAmplify` | Group only if frontend deployment is authorised and actual app ID rendered |
+| File                                     | AWS policy/role name                               | Attach where                                                               |
+| ---------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------- |
+| `deployment-user-policy.json`            | `ExpenseTracker-Deploy`                            | `ExpenseTracker-Deployers` group only                                      |
+| `cloudformation-storage-policy.json`     | `ExpenseTracker-CfnStorage`                        | Execution role                                                             |
+| `cloudformation-compute-policy.json`     | `ExpenseTracker-CfnCompute`                        | Execution role                                                             |
+| `cloudformation-api-auth-policy.json`    | `ExpenseTracker-CfnApiAuth`                        | Execution role                                                             |
+| `cloudformation-iam-policy.json`         | `ExpenseTracker-CfnIam`                            | Execution role                                                             |
+| `temporary-first-deployment-policy.json` | `ExpenseTracker-CfnBootstrap`                      | Execution role temporarily, never the user/group                           |
+| `boundary-ApiRole.json`                  | `ExpenseTracker-ApiRole-Boundary`                  | Permissions boundary on ApiRole, applied by candidate template             |
+| `boundary-ProcessorRole.json`            | `ExpenseTracker-ProcessorRole-Boundary`            | Permissions boundary on ProcessorRole                                      |
+| `boundary-SummaryRole.json`              | `ExpenseTracker-SummaryRole-Boundary`              | Permissions boundary on SummaryRole                                        |
+| `boundary-SchedulerRole.json`            | `ExpenseTracker-SchedulerRole-Boundary`            | Permissions boundary on SchedulerRole                                      |
+| `cloudformation-trust-policy.json`       | Trust for `ExpenseTracker-CloudFormationExecution` | Role's trust relationship, not a permissions policy                        |
+| `optional-amplify-deployer-policy.json`  | `ExpenseTracker-DeployAmplify`                     | Group only if frontend deployment is authorised and actual app ID rendered |
 
 The execution permissions are split into four policies to stay under the **6,144
 non-whitespace-character limit per managed policy**. Four permanent plus one
@@ -160,15 +165,15 @@ the deployment user. Do not let the application stack own its own boundary polic
 
 The temporary execution policy covers:
 
-* HTTP API creation at the `/apis` collection and initially unknown API IDs.
+- HTTP API creation at the `/apis` collection and initially unknown API IDs.
   **During bootstrap it can modify/delete any HTTP API in this account's Sydney
   region.** API Gateway ARNs omit the account field. This is the main temporary
   overbreadth; run in a dedicated assessment account where practical, limit the
   attachment to the approved deployment window, and detach immediately afterward.
-* User-pool creation, requiring the Deployment request tag, and management of
+- User-pool creation, requiring the Deployment request tag, and management of
   Sydney pools carrying that same resource tag. Avoid using this reserved tag on
   unrelated pools. Pool tags are present in the candidate's create request.
-* Creation of only `AWSServiceRoleForAPIGateway`, with the exact
+- Creation of only `AWSServiceRoleForAPIGateway`, with the exact
   `iam:AWSServiceName = ops.apigateway.amazonaws.com` restriction. If an administrator
   has already provisioned this account-wide role, this grant need not be used.
   Do not delete this shared service-linked role during application cleanup.
@@ -205,16 +210,16 @@ contain Sydney wherever the service supports it. Bucket creation additionally
 requires `s3:LocationConstraint = ap-southeast-2`. Use regional SDK/CLI endpoints.
 The template's Sydney rule remains, but IAM provides independent restrictions.
 
-| Exception | Why and remaining restriction |
-|---|---|
-| IAM roles, policies, trust, PassRole and service-linked role bootstrap | IAM is account-global, with no regional ARN component. Applying a Sydney RequestedRegion condition to IAM would break global endpoint calls. Exact role/policy names, application role prefixes, boundaries and service conditions provide the restriction. |
-| S3 bucket/object ARNs | ARNs contain neither region nor account; exact account-bearing bucket names, artifact prefix and request-region conditions are used. Bucket location is separately constrained on creation. |
-| ValidateTemplate and GetTemplateSummary | Inline/local templates have no existing stack ARN; Resource `*`, Sydney only. This reveals template structure, not account-wide data permissions. |
-| Cognito CreateUserPool | No resource-level ARN before creation; Resource `*`, Sydney and Deployment request tag, temporary only. |
-| Cognito DescribeUserPoolDomain | Does not support resource-level scoping; Resource `*`, Sydney only. Reads domain metadata, not users. |
-| Logs delivery APIs, PutResourcePolicy, DescribeResourcePolicies, DescribeLogGroups | Account-level APIs without resource-level scope; Resource `*`, Sydney only. PutResourcePolicy is powerful and could alter regional service-delivery policies; retain it only for the documented HTTP API logging workflow and review changesets. |
-| Textract AnalyzeExpense | Runtime processor boundary only, not deployment identities; API has no receipt ARN scope. Resource `*`, Sydney only. |
-| Amplify/Cognito managed hosting distribution | Application control APIs are regional, but service-managed edge hosting can be global. No direct CloudFront permissions are granted. |
+| Exception                                                                          | Why and remaining restriction                                                                                                                                                                                                                               |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IAM roles, policies, trust, PassRole and service-linked role bootstrap             | IAM is account-global, with no regional ARN component. Applying a Sydney RequestedRegion condition to IAM would break global endpoint calls. Exact role/policy names, application role prefixes, boundaries and service conditions provide the restriction. |
+| S3 bucket/object ARNs                                                              | ARNs contain neither region nor account; exact account-bearing bucket names, artifact prefix and request-region conditions are used. Bucket location is separately constrained on creation.                                                                 |
+| ValidateTemplate and GetTemplateSummary                                            | Inline/local templates have no existing stack ARN; Resource `*`, Sydney only. This reveals template structure, not account-wide data permissions.                                                                                                           |
+| Cognito CreateUserPool                                                             | No resource-level ARN before creation; Resource `*`, Sydney and Deployment request tag, temporary only.                                                                                                                                                     |
+| Cognito DescribeUserPoolDomain                                                     | Does not support resource-level scoping; Resource `*`, Sydney only. Reads domain metadata, not users.                                                                                                                                                       |
+| Logs delivery APIs, PutResourcePolicy, DescribeResourcePolicies, DescribeLogGroups | Account-level APIs without resource-level scope; Resource `*`, Sydney only. PutResourcePolicy is powerful and could alter regional service-delivery policies; retain it only for the documented HTTP API logging workflow and review changesets.            |
+| Textract AnalyzeExpense                                                            | Runtime processor boundary only, not deployment identities; API has no receipt ARN scope. Resource `*`, Sydney only.                                                                                                                                        |
+| Amplify/Cognito managed hosting distribution                                       | Application control APIs are regional, but service-managed edge hosting can be global. No direct CloudFront permissions are granted.                                                                                                                        |
 
 Do not describe Resource `*` as automatically global: many of these actions remain
 region-restricted. These policies are additive allows; unrelated future policy
@@ -359,8 +364,8 @@ on every CloudFormation handler path.
 
 Still requires a separately approved AWS review: IAM Access Analyzer findings on
 rendered policies; effective IAM/SCP/boundary/resource-policy evaluation; actual
-create/update/delete/rollback handler calls and resource-name formats; API Gateway
-encoded tag ARN handling; Cognito resource-tag evaluation/propagation during create;
+create/update/delete/rollback handler calls and resource-name formats; HTTP API
+tagging authorization; Cognito resource-tag evaluation/propagation during create;
 service-linked role creation; CloudWatch delivery policy behaviour; role deletion
 with the boundary-removal deny; artifact access using the selected SAM CLI version;
 regional service availability and account quotas. This proposal is not a claim of

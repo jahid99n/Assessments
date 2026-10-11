@@ -6,14 +6,26 @@
       "Effect": "Allow",
       "Action": [
         "apigateway:GET",
-        "apigateway:POST",
         "apigateway:PUT",
         "apigateway:PATCH",
         "apigateway:DELETE"
       ],
+      "Resource": "arn:aws:apigateway:ap-southeast-2::/apis/REVIEW_API_ID",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-2"
+        }
+      }
+    },
+    {
+      "Sid": "ManageKnownHttpApiCollections",
+      "Effect": "Allow",
+      "Action": ["apigateway:GET", "apigateway:POST"],
       "Resource": [
-        "arn:aws:apigateway:ap-southeast-2::/apis/REVIEW_API_ID",
-        "arn:aws:apigateway:ap-southeast-2::/apis/REVIEW_API_ID/*"
+        "arn:aws:apigateway:ap-southeast-2::/apis/REVIEW_API_ID/authorizers",
+        "arn:aws:apigateway:ap-southeast-2::/apis/REVIEW_API_ID/integrations",
+        "arn:aws:apigateway:ap-southeast-2::/apis/REVIEW_API_ID/routes",
+        "arn:aws:apigateway:ap-southeast-2::/apis/REVIEW_API_ID/stages"
       ],
       "Condition": {
         "StringEquals": {
@@ -22,14 +34,15 @@
       }
     },
     {
-      "Sid": "TagKnownHttpApi",
+      "Sid": "ManageKnownHttpApiChildren",
       "Effect": "Allow",
-      "Action": [
-        "apigateway:GET",
-        "apigateway:PUT",
-        "apigateway:DELETE"
+      "Action": ["apigateway:GET", "apigateway:PATCH", "apigateway:DELETE"],
+      "Resource": [
+        "arn:aws:apigateway:ap-southeast-2::/apis/REVIEW_API_ID/authorizers/*",
+        "arn:aws:apigateway:ap-southeast-2::/apis/REVIEW_API_ID/integrations/*",
+        "arn:aws:apigateway:ap-southeast-2::/apis/REVIEW_API_ID/routes/*",
+        "arn:aws:apigateway:ap-southeast-2::/apis/REVIEW_API_ID/stages/*"
       ],
-      "Resource": "arn:aws:apigateway:ap-southeast-2::/tags/arn%3Aaws%3Aapigateway%3Aap-southeast-2%3A%3A%2Fapis%2FREVIEW_API_ID",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -61,7 +74,7 @@
         "cognito-idp:UntagResource",
         "cognito-idp:ListTagsForResource"
       ],
-      "Resource": "arn:aws:cognito-idp:ap-southeast-2:111122223333:userpool/ap-southeast-2_REVIEW",
+      "Resource": "arn:aws:cognito-idp:ap-southeast-2:296280725059:userpool/ap-southeast-2_REVIEW",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -71,9 +84,7 @@
     {
       "Sid": "ReadCognitoDomain",
       "Effect": "Allow",
-      "Action": [
-        "cognito-idp:DescribeUserPoolDomain"
-      ],
+      "Action": ["cognito-idp:DescribeUserPoolDomain"],
       "Resource": "*",
       "Condition": {
         "StringEquals": {

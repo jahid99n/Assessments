@@ -22,9 +22,9 @@
         "lambda:DeleteFunctionEventInvokeConfig"
       ],
       "Resource": [
-        "arn:aws:lambda:ap-southeast-2:111122223333:function:smart-expense-expense-api",
-        "arn:aws:lambda:ap-southeast-2:111122223333:function:smart-expense-receipt-processor",
-        "arn:aws:lambda:ap-southeast-2:111122223333:function:smart-expense-weekly-summary"
+        "arn:aws:lambda:ap-southeast-2:296280725059:function:smart-expense-expense-api",
+        "arn:aws:lambda:ap-southeast-2:296280725059:function:smart-expense-receipt-processor",
+        "arn:aws:lambda:ap-southeast-2:296280725059:function:smart-expense-weekly-summary"
       ],
       "Condition": {
         "StringEquals": {
@@ -35,21 +35,16 @@
     {
       "Sid": "OnlyApiGatewayAndS3InvocationGrants",
       "Effect": "Allow",
-      "Action": [
-        "lambda:AddPermission"
-      ],
+      "Action": ["lambda:AddPermission"],
       "Resource": [
-        "arn:aws:lambda:ap-southeast-2:111122223333:function:smart-expense-expense-api",
-        "arn:aws:lambda:ap-southeast-2:111122223333:function:smart-expense-receipt-processor",
-        "arn:aws:lambda:ap-southeast-2:111122223333:function:smart-expense-weekly-summary"
+        "arn:aws:lambda:ap-southeast-2:296280725059:function:smart-expense-expense-api",
+        "arn:aws:lambda:ap-southeast-2:296280725059:function:smart-expense-receipt-processor",
+        "arn:aws:lambda:ap-southeast-2:296280725059:function:smart-expense-weekly-summary"
       ],
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2",
-          "lambda:Principal": [
-            "apigateway.amazonaws.com",
-            "s3.amazonaws.com"
-          ]
+          "lambda:Principal": ["apigateway.amazonaws.com", "s3.amazonaws.com"]
         }
       }
     },
@@ -64,7 +59,7 @@
         "scheduler:TagResource",
         "scheduler:UntagResource"
       ],
-      "Resource": "arn:aws:scheduler:ap-southeast-2:111122223333:schedule-group/ict5205-expenses-ScheduleGroup-*",
+      "Resource": "arn:aws:scheduler:ap-southeast-2:296280725059:schedule-group/ict5205-expenses-ScheduleGroup-*",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -80,7 +75,7 @@
         "scheduler:UpdateSchedule",
         "scheduler:DeleteSchedule"
       ],
-      "Resource": "arn:aws:scheduler:ap-southeast-2:111122223333:schedule/ict5205-expenses-ScheduleGroup-*/ict5205-expenses-WeeklySchedule-*",
+      "Resource": "arn:aws:scheduler:ap-southeast-2:296280725059:schedule/ict5205-expenses-ScheduleGroup-*/ict5205-expenses-WeeklySchedule-*",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -106,14 +101,14 @@
         "logs:ListTagsLogGroup"
       ],
       "Resource": [
-        "arn:aws:logs:ap-southeast-2:111122223333:log-group:/aws/lambda/smart-expense-expense-api",
-        "arn:aws:logs:ap-southeast-2:111122223333:log-group:/aws/lambda/smart-expense-expense-api:*",
-        "arn:aws:logs:ap-southeast-2:111122223333:log-group:/aws/lambda/smart-expense-receipt-processor",
-        "arn:aws:logs:ap-southeast-2:111122223333:log-group:/aws/lambda/smart-expense-receipt-processor:*",
-        "arn:aws:logs:ap-southeast-2:111122223333:log-group:/aws/lambda/smart-expense-weekly-summary",
-        "arn:aws:logs:ap-southeast-2:111122223333:log-group:/aws/lambda/smart-expense-weekly-summary:*",
-        "arn:aws:logs:ap-southeast-2:111122223333:log-group:ict5205-expenses-ApiLogs-*",
-        "arn:aws:logs:ap-southeast-2:111122223333:log-group:ict5205-expenses-ApiLogs-*:*"
+        "arn:aws:logs:ap-southeast-2:296280725059:log-group:/aws/lambda/smart-expense-expense-api",
+        "arn:aws:logs:ap-southeast-2:296280725059:log-group:/aws/lambda/smart-expense-expense-api:*",
+        "arn:aws:logs:ap-southeast-2:296280725059:log-group:/aws/lambda/smart-expense-receipt-processor",
+        "arn:aws:logs:ap-southeast-2:296280725059:log-group:/aws/lambda/smart-expense-receipt-processor:*",
+        "arn:aws:logs:ap-southeast-2:296280725059:log-group:/aws/lambda/smart-expense-weekly-summary",
+        "arn:aws:logs:ap-southeast-2:296280725059:log-group:/aws/lambda/smart-expense-weekly-summary:*",
+        "arn:aws:logs:ap-southeast-2:296280725059:log-group:ict5205-expenses-ApiLogs-*",
+        "arn:aws:logs:ap-southeast-2:296280725059:log-group:ict5205-expenses-ApiLogs-*:*"
       ],
       "Condition": {
         "StringEquals": {
@@ -153,10 +148,10 @@
         "cloudwatch:ListTagsForResource"
       ],
       "Resource": [
-        "arn:aws:cloudwatch:ap-southeast-2:111122223333:alarm:ict5205-expenses-ProcessorErrors-*",
-        "arn:aws:cloudwatch:ap-southeast-2:111122223333:alarm:ict5205-expenses-ApiErrors-*",
-        "arn:aws:cloudwatch:ap-southeast-2:111122223333:alarm:ict5205-expenses-SummaryErrors-*",
-        "arn:aws:cloudwatch:ap-southeast-2:111122223333:alarm:ict5205-expenses-NotificationAlarm-*"
+        "arn:aws:cloudwatch:ap-southeast-2:296280725059:alarm:ict5205-expenses-ProcessorErrors-*",
+        "arn:aws:cloudwatch:ap-southeast-2:296280725059:alarm:ict5205-expenses-ApiErrors-*",
+        "arn:aws:cloudwatch:ap-southeast-2:296280725059:alarm:ict5205-expenses-SummaryErrors-*",
+        "arn:aws:cloudwatch:ap-southeast-2:296280725059:alarm:ict5205-expenses-NotificationAlarm-*"
       ],
       "Condition": {
         "StringEquals": {

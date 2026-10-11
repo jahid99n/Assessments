@@ -4,23 +4,19 @@
     {
       "Sid": "ChangeSetsUsingExecutionRole",
       "Effect": "Allow",
-      "Action": [
-        "cloudformation:CreateChangeSet"
-      ],
-      "Resource": "arn:aws:cloudformation:ap-southeast-2:111122223333:stack/ict5205-expenses/*",
+      "Action": ["cloudformation:CreateChangeSet"],
+      "Resource": "arn:aws:cloudformation:ap-southeast-2:296280725059:stack/ict5205-expenses/*",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2",
-          "cloudformation:RoleArn": "arn:aws:iam::111122223333:role/ExpenseTracker-CloudFormationExecution"
+          "cloudformation:RoleArn": "arn:aws:iam::296280725059:role/ExpenseTracker-CloudFormationExecution"
         }
       }
     },
     {
       "Sid": "ServerlessTransform",
       "Effect": "Allow",
-      "Action": [
-        "cloudformation:CreateChangeSet"
-      ],
+      "Action": ["cloudformation:CreateChangeSet"],
       "Resource": "arn:aws:cloudformation:ap-southeast-2:aws:transform/Serverless-2016-10-31",
       "Condition": {
         "StringEquals": {
@@ -43,7 +39,7 @@
         "cloudformation:DeleteChangeSet",
         "cloudformation:CancelUpdateStack"
       ],
-      "Resource": "arn:aws:cloudformation:ap-southeast-2:111122223333:stack/ict5205-expenses/*",
+      "Resource": "arn:aws:cloudformation:ap-southeast-2:296280725059:stack/ict5205-expenses/*",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -57,11 +53,11 @@
         "cloudformation:DeleteStack",
         "cloudformation:ContinueUpdateRollback"
       ],
-      "Resource": "arn:aws:cloudformation:ap-southeast-2:111122223333:stack/ict5205-expenses/*",
+      "Resource": "arn:aws:cloudformation:ap-southeast-2:296280725059:stack/ict5205-expenses/*",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2",
-          "cloudformation:RoleArn": "arn:aws:iam::111122223333:role/ExpenseTracker-CloudFormationExecution"
+          "cloudformation:RoleArn": "arn:aws:iam::296280725059:role/ExpenseTracker-CloudFormationExecution"
         }
       }
     },
@@ -82,10 +78,8 @@
     {
       "Sid": "PassOnlyExecutionRole",
       "Effect": "Allow",
-      "Action": [
-        "iam:PassRole"
-      ],
-      "Resource": "arn:aws:iam::111122223333:role/ExpenseTracker-CloudFormationExecution",
+      "Action": ["iam:PassRole"],
+      "Resource": "arn:aws:iam::296280725059:role/ExpenseTracker-CloudFormationExecution",
       "Condition": {
         "StringEquals": {
           "iam:PassedToService": "cloudformation.amazonaws.com"
@@ -95,10 +89,8 @@
     {
       "Sid": "ArtifactBucketLocation",
       "Effect": "Allow",
-      "Action": [
-        "s3:GetBucketLocation"
-      ],
-      "Resource": "arn:aws:s3:::smart-expense-111122223333-ap-southeast-2-artifacts",
+      "Action": ["s3:GetBucketLocation"],
+      "Resource": "arn:aws:s3:::smart-expense-296280725059-ap-southeast-2-artifacts",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -108,19 +100,14 @@
     {
       "Sid": "ListArtifactPrefix",
       "Effect": "Allow",
-      "Action": [
-        "s3:ListBucket"
-      ],
-      "Resource": "arn:aws:s3:::smart-expense-111122223333-ap-southeast-2-artifacts",
+      "Action": ["s3:ListBucket"],
+      "Resource": "arn:aws:s3:::smart-expense-296280725059-ap-southeast-2-artifacts",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
         },
         "StringLike": {
-          "s3:prefix": [
-            "ict5205-expenses",
-            "ict5205-expenses/*"
-          ]
+          "s3:prefix": ["ict5205-expenses", "ict5205-expenses/*"]
         }
       }
     },
@@ -136,7 +123,7 @@
         "s3:AbortMultipartUpload",
         "s3:ListMultipartUploadParts"
       ],
-      "Resource": "arn:aws:s3:::smart-expense-111122223333-ap-southeast-2-artifacts/ict5205-expenses/*",
+      "Resource": "arn:aws:s3:::smart-expense-296280725059-ap-southeast-2-artifacts/ict5205-expenses/*",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"

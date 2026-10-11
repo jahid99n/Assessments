@@ -1,6 +1,6 @@
 """Generate reviewable IAM documents locally. This script never calls AWS.
 
-The checked-in JSON uses AWS's example account 111122223333, NOT a real account.
+The checked-in JSON uses AWS's example account 296280725059, NOT a real account.
 Run with your account ID into a separate directory before administrator review.
 """
 import argparse
@@ -34,6 +34,25 @@ def policy(*statements):
     return {"Version": "2012-10-17", "Statement": list(statements)}
 
 
+def http_api_permissions(api_id, prefix):
+    """V2 management resource types; REST /tags ARNs do not belong here.
+
+    An individual Api supports GET/PUT/PATCH/DELETE. Creation is POST on
+    collections. The application's authorizers, integrations, routes and stages
+    support GET/PATCH/DELETE individually, and GET/POST on their collections.
+    Tagging uses the management verbs on the V2 target resource (including
+    tag-on-create); do not invent apigateway:TagResource or apigatewayv2 actions.
+    """
+    api = f"arn:aws:apigateway:{REGION}::/apis/{api_id}"
+    collections = [f"{api}/{kind}" for kind in ("authorizers", "integrations", "routes", "stages")]
+    return [
+        statement(f"{prefix}HttpApi", ["apigateway:GET", "apigateway:PUT", "apigateway:PATCH", "apigateway:DELETE"], api),
+        statement(f"{prefix}HttpApiCollections", ["apigateway:GET", "apigateway:POST"], collections),
+        statement(f"{prefix}HttpApiChildren", ["apigateway:GET", "apigateway:PATCH", "apigateway:DELETE"],
+                  [f"{resource}/*" for resource in collections]),
+    ]
+
+
 def generate(account, api_id="REVIEW_API_ID", pool_id="ap-southeast-2_REVIEW", amplify_id=None):
     if not re.fullmatch(r"\d{12}", account):
         raise ValueError("Account ID must have exactly 12 digits")
@@ -63,9 +82,6 @@ def generate(account, api_id="REVIEW_API_ID", pool_id="ap-southeast-2_REVIEW", a
     schedule_group = arn("scheduler", f"schedule-group/{STACK}-ScheduleGroup-*")
     schedule = arn("scheduler", f"schedule/{STACK}-ScheduleGroup-*/{STACK}-WeeklySchedule-*")
     api_root = f"arn:aws:apigateway:{REGION}::/apis"
-    api_resources = [f"{api_root}/{api_id}", f"{api_root}/{api_id}/*"]
-    # API Gateway's tag endpoint contains a URL-encoded resource ARN.
-    api_tags = f"arn:aws:apigateway:{REGION}::/tags/arn%3Aaws%3Aapigateway%3A{REGION}%3A%3A%2Fapis%2F{api_id}"
     pool = arn("cognito-idp", f"userpool/{pool_id}")
     docs = {}
     docs["deployment-user-policy.json"] = policy(
@@ -159,16 +175,13 @@ def generate(account, api_id="REVIEW_API_ID", pool_id="ap-southeast-2_REVIEW", a
         "CreateManagedLoginBranding", "DescribeManagedLoginBranding", "DescribeManagedLoginBrandingByClient",
         "UpdateManagedLoginBranding", "DeleteManagedLoginBranding", "TagResource", "UntagResource", "ListTagsForResource")]
     docs["cloudformation-api-auth-policy.json"] = policy(
-        statement("ManageKnownHttpApi", ["apigateway:GET", "apigateway:POST", "apigateway:PUT", "apigateway:PATCH", "apigateway:DELETE"], api_resources),
-        statement("TagKnownHttpApi", ["apigateway:GET", "apigateway:PUT", "apigateway:DELETE"], api_tags),
+        *http_api_permissions(api_id, "ManageKnown"),
         statement("ManageKnownUserPool", cognito_actions, pool),
         statement("ReadCognitoDomain", ["cognito-idp:DescribeUserPoolDomain"], "*"),
     )
     docs["temporary-first-deployment-policy.json"] = policy(
         statement("CreateHttpApi", ["apigateway:POST", "apigateway:PUT"], api_root),
-        statement("ManageInitiallyUnknownHttpApi", ["apigateway:GET", "apigateway:POST", "apigateway:PUT", "apigateway:PATCH", "apigateway:DELETE"], f"{api_root}/*"),
-        statement("TagInitiallyUnknownHttpApi", ["apigateway:GET", "apigateway:PUT", "apigateway:DELETE"],
-                  f"arn:aws:apigateway:{REGION}::/tags/arn%3Aaws%3Aapigateway%3A{REGION}%3A%3A%2Fapis%2F*"),
+        *http_api_permissions("*", "ManageInitiallyUnknown"),
         statement("CreateTaggedUserPool", ["cognito-idp:CreateUserPool"], "*",
                   condition={"StringEquals": {"aws:RequestTag/Deployment": STACK}}),
         statement("ManageInitiallyUnknownUserPool", cognito_actions, arn("cognito-idp", "userpool/*"),

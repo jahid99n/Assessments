@@ -4,7 +4,7 @@
     {
       "Effect": "Allow",
       "Action": "dynamodb:Query",
-      "Resource": "arn:aws:dynamodb:ap-southeast-2:111122223333:table/ict5205-expenses-Expenses-*",
+      "Resource": "arn:aws:dynamodb:ap-southeast-2:296280725059:table/ict5205-expenses-Expenses-*",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -13,12 +13,8 @@
     },
     {
       "Effect": "Allow",
-      "Action": [
-        "dynamodb:GetItem",
-        "dynamodb:PutItem",
-        "dynamodb:UpdateItem"
-      ],
-      "Resource": "arn:aws:dynamodb:ap-southeast-2:111122223333:table/ict5205-expenses-Budgets-*",
+      "Action": ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem"],
+      "Resource": "arn:aws:dynamodb:ap-southeast-2:296280725059:table/ict5205-expenses-Budgets-*",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -28,7 +24,7 @@
     {
       "Effect": "Allow",
       "Action": "dynamodb:Scan",
-      "Resource": "arn:aws:dynamodb:ap-southeast-2:111122223333:table/ict5205-expenses-Budgets-*",
+      "Resource": "arn:aws:dynamodb:ap-southeast-2:296280725059:table/ict5205-expenses-Budgets-*",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -42,7 +38,7 @@
         "sns:ListSubscriptionsByTopic",
         "sns:GetSubscriptionAttributes"
       ],
-      "Resource": "arn:aws:sns:ap-southeast-2:111122223333:smart-expense-expense-alerts",
+      "Resource": "arn:aws:sns:ap-southeast-2:296280725059:smart-expense-expense-alerts",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -51,11 +47,8 @@
     },
     {
       "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": "arn:aws:logs:ap-southeast-2:111122223333:log-group:/aws/lambda/smart-expense-weekly-summary:*",
+      "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": "arn:aws:logs:ap-southeast-2:296280725059:log-group:/aws/lambda/smart-expense-weekly-summary:*",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"

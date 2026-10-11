@@ -10,10 +10,10 @@
         "iam:PutRolePolicy",
         "iam:UpdateAssumeRolePolicy"
       ],
-      "Resource": "arn:aws:iam::111122223333:role/ict5205-expenses-ApiRole-*",
+      "Resource": "arn:aws:iam::296280725059:role/ict5205-expenses-ApiRole-*",
       "Condition": {
         "ArnEquals": {
-          "iam:PermissionsBoundary": "arn:aws:iam::111122223333:policy/ExpenseTracker-ApiRole-Boundary"
+          "iam:PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-ApiRole-Boundary"
         }
       }
     },
@@ -26,10 +26,10 @@
         "iam:PutRolePolicy",
         "iam:UpdateAssumeRolePolicy"
       ],
-      "Resource": "arn:aws:iam::111122223333:role/ict5205-expenses-ProcessorRole-*",
+      "Resource": "arn:aws:iam::296280725059:role/ict5205-expenses-ProcessorRole-*",
       "Condition": {
         "ArnEquals": {
-          "iam:PermissionsBoundary": "arn:aws:iam::111122223333:policy/ExpenseTracker-ProcessorRole-Boundary"
+          "iam:PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-ProcessorRole-Boundary"
         }
       }
     },
@@ -42,10 +42,10 @@
         "iam:PutRolePolicy",
         "iam:UpdateAssumeRolePolicy"
       ],
-      "Resource": "arn:aws:iam::111122223333:role/ict5205-expenses-SummaryRole-*",
+      "Resource": "arn:aws:iam::296280725059:role/ict5205-expenses-SummaryRole-*",
       "Condition": {
         "ArnEquals": {
-          "iam:PermissionsBoundary": "arn:aws:iam::111122223333:policy/ExpenseTracker-SummaryRole-Boundary"
+          "iam:PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-SummaryRole-Boundary"
         }
       }
     },
@@ -58,10 +58,10 @@
         "iam:PutRolePolicy",
         "iam:UpdateAssumeRolePolicy"
       ],
-      "Resource": "arn:aws:iam::111122223333:role/ict5205-expenses-SchedulerRole-*",
+      "Resource": "arn:aws:iam::296280725059:role/ict5205-expenses-SchedulerRole-*",
       "Condition": {
         "ArnEquals": {
-          "iam:PermissionsBoundary": "arn:aws:iam::111122223333:policy/ExpenseTracker-SchedulerRole-Boundary"
+          "iam:PermissionsBoundary": "arn:aws:iam::296280725059:policy/ExpenseTracker-SchedulerRole-Boundary"
         }
       }
     },
@@ -81,22 +81,20 @@
         "iam:ListRoleTags"
       ],
       "Resource": [
-        "arn:aws:iam::111122223333:role/ict5205-expenses-ApiRole-*",
-        "arn:aws:iam::111122223333:role/ict5205-expenses-ProcessorRole-*",
-        "arn:aws:iam::111122223333:role/ict5205-expenses-SummaryRole-*",
-        "arn:aws:iam::111122223333:role/ict5205-expenses-SchedulerRole-*"
+        "arn:aws:iam::296280725059:role/ict5205-expenses-ApiRole-*",
+        "arn:aws:iam::296280725059:role/ict5205-expenses-ProcessorRole-*",
+        "arn:aws:iam::296280725059:role/ict5205-expenses-SummaryRole-*",
+        "arn:aws:iam::296280725059:role/ict5205-expenses-SchedulerRole-*"
       ]
     },
     {
       "Sid": "PassLambdaRoles",
       "Effect": "Allow",
-      "Action": [
-        "iam:PassRole"
-      ],
+      "Action": ["iam:PassRole"],
       "Resource": [
-        "arn:aws:iam::111122223333:role/ict5205-expenses-ApiRole-*",
-        "arn:aws:iam::111122223333:role/ict5205-expenses-ProcessorRole-*",
-        "arn:aws:iam::111122223333:role/ict5205-expenses-SummaryRole-*"
+        "arn:aws:iam::296280725059:role/ict5205-expenses-ApiRole-*",
+        "arn:aws:iam::296280725059:role/ict5205-expenses-ProcessorRole-*",
+        "arn:aws:iam::296280725059:role/ict5205-expenses-SummaryRole-*"
       ],
       "Condition": {
         "StringEquals": {
@@ -107,10 +105,8 @@
     {
       "Sid": "PassSchedulerRole",
       "Effect": "Allow",
-      "Action": [
-        "iam:PassRole"
-      ],
-      "Resource": "arn:aws:iam::111122223333:role/ict5205-expenses-SchedulerRole-*",
+      "Action": ["iam:PassRole"],
+      "Resource": "arn:aws:iam::296280725059:role/ict5205-expenses-SchedulerRole-*",
       "Condition": {
         "StringEquals": {
           "iam:PassedToService": "scheduler.amazonaws.com"
@@ -122,10 +118,10 @@
       "Effect": "Deny",
       "Action": "iam:DeleteRolePermissionsBoundary",
       "Resource": [
-        "arn:aws:iam::111122223333:role/ict5205-expenses-ApiRole-*",
-        "arn:aws:iam::111122223333:role/ict5205-expenses-ProcessorRole-*",
-        "arn:aws:iam::111122223333:role/ict5205-expenses-SummaryRole-*",
-        "arn:aws:iam::111122223333:role/ict5205-expenses-SchedulerRole-*"
+        "arn:aws:iam::296280725059:role/ict5205-expenses-ApiRole-*",
+        "arn:aws:iam::296280725059:role/ict5205-expenses-ProcessorRole-*",
+        "arn:aws:iam::296280725059:role/ict5205-expenses-SummaryRole-*",
+        "arn:aws:iam::296280725059:role/ict5205-expenses-SchedulerRole-*"
       ]
     }
   ]

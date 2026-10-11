@@ -1,0 +1,79 @@
+{
+  "scope": "HTTP API resource types used by this template; subset cross-checked against the V2 SAR. Not an IAM simulator.",
+  "sources": [
+    "https://servicereference.us-east-1.amazonaws.com/v1/apigateway/apigateway.json",
+    "https://docs.aws.amazon.com/service-authorization/latest/reference/list_apigatewayv2.html",
+    "https://docs.aws.amazon.com/service-authorization/latest/reference/list_apigateway.html"
+  ],
+  "actions": {
+    "DELETE": [
+      "Api",
+      "Authorizer",
+      "Integration",
+      "Route",
+      "Stage"
+    ],
+    "GET": [
+      "Api",
+      "Apis",
+      "Authorizer",
+      "Authorizers",
+      "Integration",
+      "Integrations",
+      "Route",
+      "Routes",
+      "Stage",
+      "Stages"
+    ],
+    "PATCH": [
+      "Api",
+      "Authorizer",
+      "Integration",
+      "Route",
+      "Stage"
+    ],
+    "POST": [
+      "Apis",
+      "Authorizers",
+      "Integrations",
+      "Routes",
+      "Stages"
+    ],
+    "PUT": [
+      "Api",
+      "Apis"
+    ]
+  },
+  "resources": {
+    "Api": [
+      "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}"
+    ],
+    "Apis": [
+      "arn:${Partition}:apigateway:${Region}::/apis"
+    ],
+    "Authorizer": [
+      "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/authorizers/${AuthorizerId}"
+    ],
+    "Authorizers": [
+      "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/authorizers"
+    ],
+    "Integration": [
+      "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/integrations/${IntegrationId}"
+    ],
+    "Integrations": [
+      "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/integrations"
+    ],
+    "Route": [
+      "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/routes/${RouteId}"
+    ],
+    "Routes": [
+      "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/routes"
+    ],
+    "Stage": [
+      "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/stages/${StageName}"
+    ],
+    "Stages": [
+      "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/stages"
+    ]
+  }
+}

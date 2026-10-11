@@ -4,11 +4,8 @@
     {
       "Sid": "ReadPackagedArtifacts",
       "Effect": "Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:GetObjectVersion"
-      ],
-      "Resource": "arn:aws:s3:::smart-expense-111122223333-ap-southeast-2-artifacts/ict5205-expenses/*",
+      "Action": ["s3:GetObject", "s3:GetObjectVersion"],
+      "Resource": "arn:aws:s3:::smart-expense-296280725059-ap-southeast-2-artifacts/ict5205-expenses/*",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -18,10 +15,8 @@
     {
       "Sid": "ArtifactBucketLocation",
       "Effect": "Allow",
-      "Action": [
-        "s3:GetBucketLocation"
-      ],
-      "Resource": "arn:aws:s3:::smart-expense-111122223333-ap-southeast-2-artifacts",
+      "Action": ["s3:GetBucketLocation"],
+      "Resource": "arn:aws:s3:::smart-expense-296280725059-ap-southeast-2-artifacts",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -31,10 +26,8 @@
     {
       "Sid": "CreateReceiptBucketInSydney",
       "Effect": "Allow",
-      "Action": [
-        "s3:CreateBucket"
-      ],
-      "Resource": "arn:aws:s3:::smart-expense-111122223333-ap-southeast-2-receipts",
+      "Action": ["s3:CreateBucket"],
+      "Resource": "arn:aws:s3:::smart-expense-296280725059-ap-southeast-2-receipts",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2",
@@ -70,7 +63,7 @@
         "s3:DeleteBucketPolicy",
         "s3:GetBucketAcl"
       ],
-      "Resource": "arn:aws:s3:::smart-expense-111122223333-ap-southeast-2-receipts",
+      "Resource": "arn:aws:s3:::smart-expense-296280725059-ap-southeast-2-receipts",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
@@ -92,8 +85,8 @@
         "dynamodb:UntagResource"
       ],
       "Resource": [
-        "arn:aws:dynamodb:ap-southeast-2:111122223333:table/ict5205-expenses-Expenses-*",
-        "arn:aws:dynamodb:ap-southeast-2:111122223333:table/ict5205-expenses-Budgets-*"
+        "arn:aws:dynamodb:ap-southeast-2:296280725059:table/ict5205-expenses-Expenses-*",
+        "arn:aws:dynamodb:ap-southeast-2:296280725059:table/ict5205-expenses-Budgets-*"
       ],
       "Condition": {
         "StringEquals": {
@@ -113,7 +106,7 @@
         "sns:TagResource",
         "sns:UntagResource"
       ],
-      "Resource": "arn:aws:sns:ap-southeast-2:111122223333:smart-expense-expense-alerts",
+      "Resource": "arn:aws:sns:ap-southeast-2:296280725059:smart-expense-expense-alerts",
       "Condition": {
         "StringEquals": {
           "aws:RequestedRegion": "ap-southeast-2"
