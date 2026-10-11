@@ -1,0 +1,1866 @@
+{
+  "retrievedOn": "2026-10-11",
+  "purpose": "Public AWS service authorization reference subset; not a permissions simulation",
+  "services": {
+    "amplify": {
+      "source": "https://servicereference.us-east-1.amazonaws.com/v1/amplify/amplify.json",
+      "actions": {
+        "CreateDeployment": {
+          "resources": [
+            "branches"
+          ],
+          "conditionKeys": []
+        },
+        "GetApp": {
+          "resources": [
+            "apps"
+          ],
+          "conditionKeys": []
+        },
+        "GetBranch": {
+          "resources": [
+            "branches"
+          ],
+          "conditionKeys": []
+        },
+        "GetJob": {
+          "resources": [
+            "jobs"
+          ],
+          "conditionKeys": []
+        },
+        "ListJobs": {
+          "resources": [
+            "branches"
+          ],
+          "conditionKeys": []
+        },
+        "StartDeployment": {
+          "resources": [
+            "branches"
+          ],
+          "conditionKeys": []
+        }
+      }
+    },
+    "apigateway": {
+      "source": "https://servicereference.us-east-1.amazonaws.com/v1/apigateway/apigateway.json",
+      "actions": {
+        "DELETE": {
+          "resources": [
+            "AccessLogSettings",
+            "Api",
+            "ApiKey",
+            "ApiMapping",
+            "Authorizer",
+            "AuthorizersCache",
+            "BasePathMapping",
+            "ClientCertificate",
+            "Cors",
+            "Deployment",
+            "DocumentationPart",
+            "DocumentationVersion",
+            "DomainName",
+            "DomainNameAccessAssociation",
+            "GatewayResponse",
+            "Integration",
+            "IntegrationResponse",
+            "Method",
+            "MethodResponse",
+            "Model",
+            "PrivateBasePathMapping",
+            "PrivateDomainName",
+            "RequestValidator",
+            "Resource",
+            "RestApi",
+            "Route",
+            "RouteRequestParameter",
+            "RouteResponse",
+            "RouteSettings",
+            "Stage",
+            "Tags",
+            "Template",
+            "UsagePlan",
+            "UsagePlanKey",
+            "VpcLink"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "GET": {
+          "resources": [
+            "AccessLogSettings",
+            "Account",
+            "Api",
+            "ApiKey",
+            "ApiKeys",
+            "ApiMapping",
+            "ApiMappings",
+            "Apis",
+            "Authorizer",
+            "Authorizers",
+            "AuthorizersCache",
+            "BasePathMapping",
+            "BasePathMappings",
+            "ClientCertificate",
+            "ClientCertificates",
+            "Cors",
+            "Deployment",
+            "Deployments",
+            "DocumentationPart",
+            "DocumentationParts",
+            "DocumentationVersion",
+            "DocumentationVersions",
+            "DomainName",
+            "DomainNameAccessAssociations",
+            "DomainNames",
+            "ExportedAPI",
+            "GatewayResponse",
+            "GatewayResponses",
+            "Integration",
+            "IntegrationResponse",
+            "IntegrationResponses",
+            "Integrations",
+            "Method",
+            "MethodResponse",
+            "Model",
+            "ModelTemplate",
+            "Models",
+            "PrivateBasePathMapping",
+            "PrivateBasePathMappings",
+            "PrivateDomainName",
+            "RequestValidator",
+            "RequestValidators",
+            "Resource",
+            "Resources",
+            "RestApi",
+            "RestApis",
+            "Route",
+            "RouteRequestParameter",
+            "RouteResponse",
+            "RouteResponses",
+            "RouteSettings",
+            "Routes",
+            "Sdk",
+            "Stage",
+            "Stages",
+            "Tags",
+            "UsagePlan",
+            "UsagePlanKey",
+            "UsagePlanKeys",
+            "UsagePlans",
+            "VpcLink",
+            "VpcLinks"
+          ],
+          "conditionKeys": []
+        },
+        "PATCH": {
+          "resources": [
+            "Account",
+            "Api",
+            "ApiKey",
+            "ApiMapping",
+            "Authorizer",
+            "BasePathMapping",
+            "ClientCertificate",
+            "Deployment",
+            "DocumentationPart",
+            "DocumentationVersion",
+            "DomainName",
+            "GatewayResponse",
+            "Integration",
+            "IntegrationResponse",
+            "Method",
+            "MethodResponse",
+            "Model",
+            "PrivateBasePathMapping",
+            "PrivateDomainName",
+            "RequestValidator",
+            "Resource",
+            "RestApi",
+            "Route",
+            "RouteRequestParameter",
+            "RouteResponse",
+            "Stage",
+            "Template",
+            "UsagePlan",
+            "UsagePlanKey",
+            "VpcLink"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "POST": {
+          "resources": [
+            "ApiKeys",
+            "ApiMappings",
+            "Apis",
+            "Authorizers",
+            "BasePathMappings",
+            "ClientCertificates",
+            "Deployments",
+            "DocumentationParts",
+            "DocumentationVersions",
+            "DomainNameAccessAssociations",
+            "DomainNames",
+            "GatewayResponses",
+            "IntegrationResponse",
+            "IntegrationResponses",
+            "Integrations",
+            "MethodResponse",
+            "Models",
+            "PrivateBasePathMappings",
+            "RequestValidators",
+            "Resources",
+            "RestApis",
+            "RouteResponses",
+            "Routes",
+            "Stages",
+            "UsagePlanKeys",
+            "UsagePlans",
+            "VpcLinks"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "PUT": {
+          "resources": [
+            "Api",
+            "Apis",
+            "DocumentationPart",
+            "GatewayResponse",
+            "IntegrationResponse",
+            "MethodResponse",
+            "RestApi",
+            "Tags"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        }
+      }
+    },
+    "cloudformation": {
+      "source": "https://servicereference.us-east-1.amazonaws.com/v1/cloudformation/cloudformation.json",
+      "actions": {
+        "CancelUpdateStack": {
+          "resources": [
+            "stack"
+          ],
+          "conditionKeys": []
+        },
+        "ContinueUpdateRollback": {
+          "resources": [
+            "stack"
+          ],
+          "conditionKeys": [
+            "cloudformation:RoleArn"
+          ]
+        },
+        "CreateChangeSet": {
+          "resources": [
+            "stack"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys",
+            "cloudformation:ChangeSetName",
+            "cloudformation:ImportResourceTypes",
+            "cloudformation:ResourceTypes",
+            "cloudformation:RoleArn",
+            "cloudformation:StackPolicyUrl",
+            "cloudformation:TemplateUrl"
+          ]
+        },
+        "DeleteChangeSet": {
+          "resources": [
+            "stack"
+          ],
+          "conditionKeys": [
+            "cloudformation:ChangeSetName"
+          ]
+        },
+        "DeleteStack": {
+          "resources": [
+            "stack"
+          ],
+          "conditionKeys": [
+            "cloudformation:RoleArn"
+          ]
+        },
+        "DescribeChangeSet": {
+          "resources": [
+            "stack"
+          ],
+          "conditionKeys": [
+            "cloudformation:ChangeSetName"
+          ]
+        },
+        "DescribeStackEvents": {
+          "resources": [
+            "stack"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeStackResource": {
+          "resources": [
+            "stack"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeStackResources": {
+          "resources": [
+            "stack"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeStacks": {
+          "resources": [
+            "stack"
+          ],
+          "conditionKeys": []
+        },
+        "ExecuteChangeSet": {
+          "resources": [
+            "stack"
+          ],
+          "conditionKeys": [
+            "cloudformation:ChangeSetName"
+          ]
+        },
+        "GetTemplate": {
+          "resources": [
+            "stack"
+          ],
+          "conditionKeys": []
+        },
+        "GetTemplateSummary": {
+          "resources": [
+            "stack",
+            "stackset"
+          ],
+          "conditionKeys": [
+            "cloudformation:TemplateUrl"
+          ]
+        },
+        "ListStackResources": {
+          "resources": [
+            "stack"
+          ],
+          "conditionKeys": []
+        },
+        "ValidateTemplate": {
+          "resources": [],
+          "conditionKeys": [
+            "cloudformation:TemplateUrl"
+          ]
+        }
+      }
+    },
+    "cloudwatch": {
+      "source": "https://servicereference.us-east-1.amazonaws.com/v1/cloudwatch/cloudwatch.json",
+      "actions": {
+        "DeleteAlarms": {
+          "resources": [
+            "alarm"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeAlarms": {
+          "resources": [
+            "alarm"
+          ],
+          "conditionKeys": []
+        },
+        "ListTagsForResource": {
+          "resources": [
+            "alarm",
+            "alarm-mute-rule",
+            "dashboard",
+            "dataset",
+            "insight-rule",
+            "metric-stream",
+            "service",
+            "slo"
+          ],
+          "conditionKeys": [
+            "cloudwatch:HasAccessGrant"
+          ]
+        },
+        "PutMetricAlarm": {
+          "resources": [
+            "alarm",
+            "dataset"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys",
+            "cloudwatch:AlarmActions"
+          ]
+        },
+        "TagResource": {
+          "resources": [
+            "alarm",
+            "alarm-mute-rule",
+            "dashboard",
+            "dataset",
+            "insight-rule",
+            "metric-stream",
+            "service",
+            "slo"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys",
+            "cloudwatch:HasAccessGrant"
+          ]
+        },
+        "UntagResource": {
+          "resources": [
+            "alarm",
+            "alarm-mute-rule",
+            "dashboard",
+            "dataset",
+            "insight-rule",
+            "metric-stream",
+            "service",
+            "slo"
+          ],
+          "conditionKeys": [
+            "aws:TagKeys",
+            "cloudwatch:HasAccessGrant"
+          ]
+        }
+      }
+    },
+    "cognito-idp": {
+      "source": "https://servicereference.us-east-1.amazonaws.com/v1/cognito-idp/cognito-idp.json",
+      "actions": {
+        "CreateManagedLoginBranding": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "CreateUserPool": {
+          "resources": [],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:ResourceTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "CreateUserPoolClient": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "CreateUserPoolDomain": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "DeleteManagedLoginBranding": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "DeleteUserPool": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "DeleteUserPoolClient": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "DeleteUserPoolDomain": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeManagedLoginBranding": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeManagedLoginBrandingByClient": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeUserPool": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeUserPoolClient": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeUserPoolDomain": {
+          "resources": [],
+          "conditionKeys": []
+        },
+        "GetUserPoolMfaConfig": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "ListTagsForResource": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "SetUserPoolMfaConfig": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "TagResource": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "UntagResource": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": [
+            "aws:TagKeys"
+          ]
+        },
+        "UpdateManagedLoginBranding": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "UpdateUserPool": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "UpdateUserPoolClient": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        },
+        "UpdateUserPoolDomain": {
+          "resources": [
+            "userpool"
+          ],
+          "conditionKeys": []
+        }
+      }
+    },
+    "dynamodb": {
+      "source": "https://servicereference.us-east-1.amazonaws.com/v1/dynamodb/dynamodb.json",
+      "actions": {
+        "CreateTable": {
+          "resources": [
+            "table"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "DeleteTable": {
+          "resources": [
+            "table"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeContinuousBackups": {
+          "resources": [
+            "table"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeTable": {
+          "resources": [
+            "table"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeTimeToLive": {
+          "resources": [
+            "table"
+          ],
+          "conditionKeys": []
+        },
+        "GetItem": {
+          "resources": [
+            "table"
+          ],
+          "conditionKeys": [
+            "dynamodb:Attributes",
+            "dynamodb:EnclosingOperation",
+            "dynamodb:LeadingKeys",
+            "dynamodb:ReturnConsumedCapacity",
+            "dynamodb:Select"
+          ]
+        },
+        "ListTagsOfResource": {
+          "resources": [
+            "stream",
+            "table"
+          ],
+          "conditionKeys": []
+        },
+        "PutItem": {
+          "resources": [
+            "table"
+          ],
+          "conditionKeys": [
+            "dynamodb:Attributes",
+            "dynamodb:EnclosingOperation",
+            "dynamodb:LeadingKeys",
+            "dynamodb:ReturnConsumedCapacity",
+            "dynamodb:ReturnValues"
+          ]
+        },
+        "Query": {
+          "resources": [
+            "index",
+            "table"
+          ],
+          "conditionKeys": [
+            "dynamodb:Attributes",
+            "dynamodb:LeadingKeys",
+            "dynamodb:ReturnConsumedCapacity",
+            "dynamodb:ReturnValues",
+            "dynamodb:Select"
+          ]
+        },
+        "Scan": {
+          "resources": [
+            "index",
+            "table"
+          ],
+          "conditionKeys": [
+            "dynamodb:Attributes",
+            "dynamodb:ReturnConsumedCapacity",
+            "dynamodb:ReturnValues",
+            "dynamodb:Select"
+          ]
+        },
+        "TagResource": {
+          "resources": [
+            "stream",
+            "table"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "UntagResource": {
+          "resources": [
+            "stream",
+            "table"
+          ],
+          "conditionKeys": [
+            "aws:TagKeys"
+          ]
+        },
+        "UpdateItem": {
+          "resources": [
+            "table"
+          ],
+          "conditionKeys": [
+            "dynamodb:Attributes",
+            "dynamodb:EnclosingOperation",
+            "dynamodb:LeadingKeys",
+            "dynamodb:ReturnConsumedCapacity",
+            "dynamodb:ReturnValues"
+          ]
+        },
+        "UpdateTable": {
+          "resources": [
+            "table"
+          ],
+          "conditionKeys": []
+        }
+      }
+    },
+    "iam": {
+      "source": "https://servicereference.us-east-1.amazonaws.com/v1/iam/iam.json",
+      "actions": {
+        "CreateRole": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys",
+            "iam:PermissionsBoundary",
+            "iam:RoleTemplateARN"
+          ]
+        },
+        "CreateServiceLinkedRole": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": [
+            "iam:AWSServiceName"
+          ]
+        },
+        "DeleteRole": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": [
+            "iam:PermissionsBoundary"
+          ]
+        },
+        "DeleteRolePermissionsBoundary": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": [
+            "iam:PermissionsBoundary"
+          ]
+        },
+        "DeleteRolePolicy": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": [
+            "iam:PermissionsBoundary"
+          ]
+        },
+        "GetRole": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": [
+            "iam:PermissionsBoundary",
+            "iam:RoleTemplateARN"
+          ]
+        },
+        "GetRolePolicy": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": []
+        },
+        "ListAttachedRolePolicies": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": []
+        },
+        "ListRolePolicies": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": []
+        },
+        "ListRoleTags": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": []
+        },
+        "PassRole": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": [
+            "iam:AssociatedResourceArn",
+            "iam:PassedToService"
+          ]
+        },
+        "PutRolePermissionsBoundary": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": [
+            "iam:PermissionsBoundary",
+            "iam:RoleTemplateARN"
+          ]
+        },
+        "PutRolePolicy": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": [
+            "iam:PermissionsBoundary",
+            "iam:RoleTemplateARN"
+          ]
+        },
+        "TagRole": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys",
+            "iam:RoleTemplateARN"
+          ]
+        },
+        "UntagRole": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": [
+            "aws:TagKeys"
+          ]
+        },
+        "UpdateAssumeRolePolicy": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": [
+            "iam:PermissionsBoundary"
+          ]
+        },
+        "UpdateRole": {
+          "resources": [
+            "role"
+          ],
+          "conditionKeys": [
+            "iam:PermissionsBoundary"
+          ]
+        }
+      }
+    },
+    "lambda": {
+      "source": "https://servicereference.us-east-1.amazonaws.com/v1/lambda/lambda.json",
+      "actions": {
+        "AddPermission": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": [
+            "lambda:FunctionUrlAuthType",
+            "lambda:Principal"
+          ]
+        },
+        "CreateFunction": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys",
+            "lambda:CodeSigningConfigArn",
+            "lambda:Layer",
+            "lambda:SecurityGroupIds",
+            "lambda:SubnetIds",
+            "lambda:VpcIds"
+          ]
+        },
+        "DeleteFunction": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": []
+        },
+        "DeleteFunctionEventInvokeConfig": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": []
+        },
+        "GetFunction": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": []
+        },
+        "GetFunctionConfiguration": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": []
+        },
+        "GetFunctionEventInvokeConfig": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": []
+        },
+        "GetPolicy": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": []
+        },
+        "InvokeFunction": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": [
+            "lambda:EventSourceToken",
+            "lambda:InvokedViaFunctionUrl"
+          ]
+        },
+        "ListTags": {
+          "resources": [
+            "capacityProvider",
+            "code signing config",
+            "eventSourceMapping",
+            "function",
+            "microvmImage",
+            "networkConnector",
+            "webFunction"
+          ],
+          "conditionKeys": []
+        },
+        "PutFunctionEventInvokeConfig": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": []
+        },
+        "RemovePermission": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": [
+            "lambda:FunctionUrlAuthType",
+            "lambda:Principal"
+          ]
+        },
+        "TagResource": {
+          "resources": [
+            "capacityProvider",
+            "code signing config",
+            "eventSourceMapping",
+            "function",
+            "microvmImage",
+            "networkConnector",
+            "webFunction"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "UntagResource": {
+          "resources": [
+            "capacityProvider",
+            "code signing config",
+            "eventSourceMapping",
+            "function",
+            "microvmImage",
+            "networkConnector",
+            "webFunction"
+          ],
+          "conditionKeys": [
+            "aws:TagKeys"
+          ]
+        },
+        "UpdateFunctionCode": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": []
+        },
+        "UpdateFunctionConfiguration": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": [
+            "lambda:Layer",
+            "lambda:SecurityGroupIds",
+            "lambda:SubnetIds",
+            "lambda:VpcIds"
+          ]
+        },
+        "UpdateFunctionEventInvokeConfig": {
+          "resources": [
+            "function"
+          ],
+          "conditionKeys": []
+        }
+      }
+    },
+    "logs": {
+      "source": "https://servicereference.us-east-1.amazonaws.com/v1/logs/logs.json",
+      "actions": {
+        "CreateLogDelivery": {
+          "resources": [],
+          "conditionKeys": []
+        },
+        "CreateLogGroup": {
+          "resources": [
+            "log-group"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "CreateLogStream": {
+          "resources": [
+            "log-stream"
+          ],
+          "conditionKeys": []
+        },
+        "DeleteLogDelivery": {
+          "resources": [],
+          "conditionKeys": []
+        },
+        "DeleteLogGroup": {
+          "resources": [
+            "log-group"
+          ],
+          "conditionKeys": []
+        },
+        "DeleteMetricFilter": {
+          "resources": [
+            "log-group"
+          ],
+          "conditionKeys": []
+        },
+        "DeleteRetentionPolicy": {
+          "resources": [
+            "log-group"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeLogGroups": {
+          "resources": [],
+          "conditionKeys": []
+        },
+        "DescribeMetricFilters": {
+          "resources": [
+            "log-group"
+          ],
+          "conditionKeys": []
+        },
+        "DescribeResourcePolicies": {
+          "resources": [],
+          "conditionKeys": []
+        },
+        "GetLogDelivery": {
+          "resources": [],
+          "conditionKeys": []
+        },
+        "ListLogDeliveries": {
+          "resources": [],
+          "conditionKeys": []
+        },
+        "ListTagsForResource": {
+          "resources": [
+            "anomaly-detector",
+            "delivery",
+            "delivery-destination",
+            "delivery-source",
+            "destination",
+            "log-group",
+            "lookup-table"
+          ],
+          "conditionKeys": []
+        },
+        "ListTagsLogGroup": {
+          "resources": [
+            "log-group"
+          ],
+          "conditionKeys": []
+        },
+        "PutLogEvents": {
+          "resources": [
+            "log-stream"
+          ],
+          "conditionKeys": []
+        },
+        "PutMetricFilter": {
+          "resources": [
+            "log-group"
+          ],
+          "conditionKeys": []
+        },
+        "PutResourcePolicy": {
+          "resources": [],
+          "conditionKeys": []
+        },
+        "PutRetentionPolicy": {
+          "resources": [
+            "log-group"
+          ],
+          "conditionKeys": []
+        },
+        "TagLogGroup": {
+          "resources": [
+            "log-group"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "TagResource": {
+          "resources": [
+            "anomaly-detector",
+            "delivery",
+            "delivery-destination",
+            "delivery-source",
+            "destination",
+            "log-group",
+            "lookup-table",
+            "scheduled-query"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "UntagLogGroup": {
+          "resources": [
+            "log-group"
+          ],
+          "conditionKeys": [
+            "aws:TagKeys"
+          ]
+        },
+        "UntagResource": {
+          "resources": [
+            "anomaly-detector",
+            "delivery",
+            "delivery-destination",
+            "delivery-source",
+            "destination",
+            "log-group",
+            "lookup-table",
+            "scheduled-query"
+          ],
+          "conditionKeys": [
+            "aws:TagKeys"
+          ]
+        },
+        "UpdateLogDelivery": {
+          "resources": [],
+          "conditionKeys": []
+        }
+      }
+    },
+    "s3": {
+      "source": "https://servicereference.us-east-1.amazonaws.com/v1/s3/s3.json",
+      "actions": {
+        "AbortMultipartUpload": {
+          "resources": [
+            "accesspointobject",
+            "object"
+          ],
+          "conditionKeys": [
+            "s3:AccessGrantsInstanceArn",
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "CreateBucket": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys",
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:locationconstraint",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-acl",
+            "s3:x-amz-bucket-namespace",
+            "s3:x-amz-content-sha256",
+            "s3:x-amz-grant-full-control",
+            "s3:x-amz-grant-read",
+            "s3:x-amz-grant-read-acp",
+            "s3:x-amz-grant-write",
+            "s3:x-amz-grant-write-acp",
+            "s3:x-amz-object-ownership"
+          ]
+        },
+        "DeleteBucket": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "DeleteBucketPolicy": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "DeleteObject": {
+          "resources": [
+            "accesspointobject",
+            "object"
+          ],
+          "conditionKeys": [
+            "s3:AccessGrantsInstanceArn",
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:if-match",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "DeleteObjectVersion": {
+          "resources": [
+            "accesspointobject",
+            "object"
+          ],
+          "conditionKeys": [
+            "s3:AccessGrantsInstanceArn",
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:versionid",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetBucketAcl": {
+          "resources": [
+            "accesspoint",
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetBucketCORS": {
+          "resources": [
+            "accesspoint",
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetBucketLocation": {
+          "resources": [
+            "accesspoint",
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetBucketNotification": {
+          "resources": [
+            "accesspoint",
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetBucketOwnershipControls": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetBucketPolicy": {
+          "resources": [
+            "accesspoint",
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetBucketPublicAccessBlock": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetBucketTagging": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetBucketVersioning": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetEncryptionConfiguration": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetLifecycleConfiguration": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetObject": {
+          "resources": [
+            "accesspointobject",
+            "object"
+          ],
+          "conditionKeys": [
+            "s3:AccessGrantsInstanceArn",
+            "s3:ExistingObjectTag/<key>",
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetObjectTagging": {
+          "resources": [
+            "accesspointobject",
+            "object"
+          ],
+          "conditionKeys": [
+            "s3:ExistingObjectTag/<key>",
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "GetObjectVersion": {
+          "resources": [
+            "accesspointobject",
+            "object"
+          ],
+          "conditionKeys": [
+            "s3:AccessGrantsInstanceArn",
+            "s3:ExistingObjectTag/<key>",
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:versionid",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "ListBucket": {
+          "resources": [
+            "accesspoint",
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:AccessGrantsInstanceArn",
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:delimiter",
+            "s3:max-keys",
+            "s3:prefix",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "ListBucketVersions": {
+          "resources": [
+            "accesspoint",
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:AccessGrantsInstanceArn",
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:delimiter",
+            "s3:max-keys",
+            "s3:prefix",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "ListMultipartUploadParts": {
+          "resources": [
+            "accesspointobject",
+            "object"
+          ],
+          "conditionKeys": [
+            "s3:AccessGrantsInstanceArn",
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "PutBucketCORS": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "PutBucketNotification": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "PutBucketOwnershipControls": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "PutBucketPolicy": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "PutBucketPublicAccessBlock": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "PutBucketTagging": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "PutBucketVersioning": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "PutEncryptionConfiguration": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "PutLifecycleConfiguration": {
+          "resources": [
+            "bucket"
+          ],
+          "conditionKeys": [
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-content-sha256"
+          ]
+        },
+        "PutObject": {
+          "resources": [
+            "accesspointobject",
+            "object"
+          ],
+          "conditionKeys": [
+            "s3:AccessGrantsInstanceArn",
+            "s3:ObjectCreationOperation",
+            "s3:RequestObjectTag/<key>",
+            "s3:RequestObjectTagKeys",
+            "s3:ResourceAccount",
+            "s3:TlsVersion",
+            "s3:authType",
+            "s3:if-match",
+            "s3:if-none-match",
+            "s3:object-lock-event-hold",
+            "s3:object-lock-event-hold-duration-days",
+            "s3:object-lock-legal-hold",
+            "s3:object-lock-mode",
+            "s3:object-lock-remaining-retention-days",
+            "s3:object-lock-retain-until-date",
+            "s3:signatureAge",
+            "s3:signatureversion",
+            "s3:x-amz-acl",
+            "s3:x-amz-content-sha256",
+            "s3:x-amz-copy-source",
+            "s3:x-amz-grant-full-control",
+            "s3:x-amz-grant-read",
+            "s3:x-amz-grant-read-acp",
+            "s3:x-amz-grant-write",
+            "s3:x-amz-grant-write-acp",
+            "s3:x-amz-metadata-directive",
+            "s3:x-amz-object-annotation-directive",
+            "s3:x-amz-server-side-encryption",
+            "s3:x-amz-server-side-encryption-aws-kms-key-id",
+            "s3:x-amz-server-side-encryption-customer-algorithm",
+            "s3:x-amz-storage-class",
+            "s3:x-amz-website-redirect-location"
+          ]
+        }
+      }
+    },
+    "scheduler": {
+      "source": "https://servicereference.us-east-1.amazonaws.com/v1/scheduler/scheduler.json",
+      "actions": {
+        "CreateSchedule": {
+          "resources": [
+            "schedule"
+          ],
+          "conditionKeys": [
+            "aws:ResourceTag/${TagKey}"
+          ]
+        },
+        "CreateScheduleGroup": {
+          "resources": [
+            "schedule-group"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "DeleteSchedule": {
+          "resources": [
+            "schedule"
+          ],
+          "conditionKeys": [
+            "aws:ResourceTag/${TagKey}"
+          ]
+        },
+        "DeleteScheduleGroup": {
+          "resources": [
+            "schedule-group"
+          ],
+          "conditionKeys": [
+            "aws:ResourceTag/${TagKey}"
+          ]
+        },
+        "GetSchedule": {
+          "resources": [
+            "schedule"
+          ],
+          "conditionKeys": [
+            "aws:ResourceTag/${TagKey}"
+          ]
+        },
+        "GetScheduleGroup": {
+          "resources": [
+            "schedule-group"
+          ],
+          "conditionKeys": [
+            "aws:ResourceTag/${TagKey}"
+          ]
+        },
+        "ListTagsForResource": {
+          "resources": [
+            "schedule-group"
+          ],
+          "conditionKeys": [
+            "aws:ResourceTag/${TagKey}"
+          ]
+        },
+        "TagResource": {
+          "resources": [
+            "schedule-group"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:ResourceTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "UntagResource": {
+          "resources": [
+            "schedule-group"
+          ],
+          "conditionKeys": [
+            "aws:ResourceTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "UpdateSchedule": {
+          "resources": [
+            "schedule"
+          ],
+          "conditionKeys": [
+            "aws:ResourceTag/${TagKey}"
+          ]
+        }
+      }
+    },
+    "sns": {
+      "source": "https://servicereference.us-east-1.amazonaws.com/v1/sns/sns.json",
+      "actions": {
+        "CreateTopic": {
+          "resources": [
+            "topic"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "DeleteTopic": {
+          "resources": [
+            "topic"
+          ],
+          "conditionKeys": []
+        },
+        "GetSubscriptionAttributes": {
+          "resources": [
+            "topic"
+          ],
+          "conditionKeys": []
+        },
+        "GetTopicAttributes": {
+          "resources": [
+            "topic"
+          ],
+          "conditionKeys": []
+        },
+        "ListSubscriptionsByTopic": {
+          "resources": [
+            "topic"
+          ],
+          "conditionKeys": []
+        },
+        "ListTagsForResource": {
+          "resources": [
+            "topic"
+          ],
+          "conditionKeys": []
+        },
+        "Publish": {
+          "resources": [
+            "topic"
+          ],
+          "conditionKeys": []
+        },
+        "SetTopicAttributes": {
+          "resources": [
+            "topic"
+          ],
+          "conditionKeys": []
+        },
+        "Subscribe": {
+          "resources": [
+            "topic"
+          ],
+          "conditionKeys": [
+            "sns:Endpoint",
+            "sns:Protocol"
+          ]
+        },
+        "TagResource": {
+          "resources": [
+            "topic"
+          ],
+          "conditionKeys": [
+            "aws:RequestTag/${TagKey}",
+            "aws:TagKeys"
+          ]
+        },
+        "Unsubscribe": {
+          "resources": [
+            "topic"
+          ],
+          "conditionKeys": []
+        },
+        "UntagResource": {
+          "resources": [
+            "topic"
+          ],
+          "conditionKeys": [
+            "aws:TagKeys"
+          ]
+        }
+      }
+    },
+    "textract": {
+      "source": "https://servicereference.us-east-1.amazonaws.com/v1/textract/textract.json",
+      "actions": {
+        "AnalyzeExpense": {
+          "resources": [],
+          "conditionKeys": []
+        }
+      }
+    }
+  }
+}

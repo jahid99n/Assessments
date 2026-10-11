@@ -1,0 +1,4 @@
+# Locally rendered account-specific proposals and downloaded full AWS reference.
+rendered/
+.service-reference.json
+__pycache__/

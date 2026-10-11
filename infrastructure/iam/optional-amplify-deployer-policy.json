@@ -1,0 +1,50 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadHostingApp",
+      "Effect": "Allow",
+      "Action": [
+        "amplify:GetApp"
+      ],
+      "Resource": "arn:aws:amplify:ap-southeast-2:111122223333:apps/reviewapp",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-2"
+        }
+      }
+    },
+    {
+      "Sid": "DeployMainBranch",
+      "Effect": "Allow",
+      "Action": [
+        "amplify:GetBranch",
+        "amplify:CreateDeployment",
+        "amplify:StartDeployment"
+      ],
+      "Resource": "arn:aws:amplify:ap-southeast-2:111122223333:apps/reviewapp/branches/main",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-2"
+        }
+      }
+    },
+    {
+      "Sid": "InspectHostingJobs",
+      "Effect": "Allow",
+      "Action": [
+        "amplify:GetJob",
+        "amplify:ListJobs"
+      ],
+      "Resource": [
+        "arn:aws:amplify:ap-southeast-2:111122223333:apps/reviewapp/branches/main",
+        "arn:aws:amplify:ap-southeast-2:111122223333:apps/reviewapp/branches/main/jobs/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-2"
+        }
+      }
+    }
+  ]
+}
