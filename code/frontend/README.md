@@ -76,7 +76,7 @@ Production is the default mode. Demo code is imported only in Vite development m
 
 - No live Cognito, API Gateway, S3, Textract, SNS or hosting verification yet.
 - The existing stats endpoint provides current-month categories and six-month trends, not arbitrary historical dashboard reports.
-- No server merchant search, receipt retry endpoint, receipt download URL or dedicated subscription administration endpoint exists; this UI does not invent them.
+- No server merchant search, receipt retry endpoint or dedicated subscription administration endpoint exists. Receipt details already include a five-minute signed `imageUrl`, exposed by the Open receipt image action (corrected in Stage 4).
 - Omitting GST on edit preserves an existing value under the current backend contract; the form explains this. Explicit GST removal needs an agreed backend contract change.
 - For accurate recent-expense ordering the overview fetches all current-month expense pages before sorting. This is reasonable for a student demo but should become a bounded date-ordered query for large accounts.
 - Backend pagination is not a snapshot; concurrent writes can change results between pages. Refresh after uncertain mutation outcomes before retrying.

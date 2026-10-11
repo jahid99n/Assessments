@@ -4,6 +4,25 @@ __pycache__/
 .coverage
 htmlcov/
 .env
+.env.*
 !.env.example
+!code/frontend/.env.demo
+.aws/
+credentials
+credentials.*
+*.pem
+*.key
+*.p12
+*.pfx
+venv/
+*.pyc
+*.log
+.DS_Store
 deploy/dist/
+.aws-sam/
+samconfig.toml
 node_modules/
+# Re-runnable local outputs; retain the explicitly named Stage 3/4 evidence.
+report/browser-results.xml
+report/frontend-results.xml
+report/build-checks.json

@@ -1,0 +1,22 @@
+{
+  "backend": {
+    "tests": 152,
+    "failed": 0,
+    "skipped": 0
+  },
+  "frontend": {
+    "tests": 67,
+    "failed": 0,
+    "skipped": 0
+  },
+  "browser": {
+    "tests": 11,
+    "failed": 0,
+    "skipped": 0
+  },
+  "integration": {
+    "tests": 6,
+    "failed": 0,
+    "skipped": 0
+  }
+}

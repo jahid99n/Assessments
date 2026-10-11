@@ -86,6 +86,8 @@ def listing(user, query):
         day = item.get("receiptDate", "")
         if item.get("kind") != "EXPENSE" or item["status"] == "DELETED":
             continue
+        if ("from" in query or "to" in query) and not day:
+            continue
         if "month" in query and not day.startswith(query["month"]):
             continue
         if "category" in query and item.get("category") != query["category"]:

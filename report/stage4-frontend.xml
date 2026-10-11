@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="67" failures="0" errors="0" time="16.7524012">
+    <testsuite name="tests/app.test.jsx" timestamp="2026-10-11T02:39:25.574Z" hostname="DESKTOP-UMHN2BG" tests="19" failures="0" errors="0" skipped="0" time="16.6718373">
+        <testcase classname="tests/app.test.jsx" name="dashboard and authentication &gt; renders cards, accessible chart summaries and demo label" time="0.851024">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="dashboard and authentication &gt; guards private routes and provides managed registration entry" time="0.0961904">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="dashboard and authentication &gt; shows configuration failure without trying AWS" time="0.0365952">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="dashboard and authentication &gt; signs out and allows entering demo again" time="0.5836951">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="dashboard and authentication &gt; displays API error with retry action" time="0.0535865">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="expense interactions &gt; creates an expense through a labelled modal" time="0.8603214">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="expense interactions &gt; edits a completed expense" time="0.7590457">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="expense interactions &gt; requires confirmation before deletion" time="0.366942">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="expense interactions &gt; filters by category and labels loaded-only search" time="0.4795003">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="expense interactions &gt; supports loading additional backend pages" time="0.2346282">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="expense interactions &gt; supports an empty page that still has a cursor" time="0.2657685">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="expense interactions &gt; displays a true empty state" time="0.0503741">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="expense interactions &gt; loads expense details" time="0.1809752">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="budget and receipt pages &gt; updates the selected month budget" time="0.2563753">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="budget and receipt pages &gt; changes month without carrying over the previous limit" time="0.0707522">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="budget and receipt pages &gt; rejects an invalid file before asking for permission" time="0.0413164">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="budget and receipt pages &gt; renders confirmed PROCESSED receipt outcome" time="0.1639563">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="budget and receipt pages &gt; renders confirmed FAILED receipt outcome" time="0.1406584">
+        </testcase>
+        <testcase classname="tests/app.test.jsx" name="budget and receipt pages &gt; shows upload error and permits checking the existing record" time="0.1498852">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/cognito.test.js" timestamp="2026-10-11T02:39:25.580Z" hostname="DESKTOP-UMHN2BG" tests="7" failures="0" errors="0" skipped="0" time="0.0144122">
+        <testcase classname="tests/cognito.test.js" name="Cognito SDK integration (mocked, no real authentication) &gt; uses the OAuth code flow and tab-scoped SDK token storage" time="0.0055247">
+        </testcase>
+        <testcase classname="tests/cognito.test.js" name="Cognito SDK integration (mocked, no real authentication) &gt; uses the ID token required by the existing API contract" time="0.0013896">
+        </testcase>
+        <testcase classname="tests/cognito.test.js" name="Cognito SDK integration (mocked, no real authentication) &gt; restores verified email from SDK session claims" time="0.0012747">
+        </testcase>
+        <testcase classname="tests/cognito.test.js" name="Cognito SDK integration (mocked, no real authentication) &gt; returns no user when there is no authenticated session" time="0.0006835">
+        </testcase>
+        <testcase classname="tests/cognito.test.js" name="Cognito SDK integration (mocked, no real authentication) &gt; delegates login and logout to Amplify" time="0.0006292">
+        </testcase>
+        <testcase classname="tests/cognito.test.js" name="Cognito SDK integration (mocked, no real authentication) &gt; notifies the UI of session changes and allows cleanup" time="0.0007481">
+        </testcase>
+        <testcase classname="tests/cognito.test.js" name="Cognito SDK integration (mocked, no real authentication) &gt; turns OAuth callback failure into a safe authentication error" time="0.0021264">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/services.test.js" timestamp="2026-10-11T02:39:25.583Z" hostname="DESKTOP-UMHN2BG" tests="41" failures="0" errors="0" skipped="0" time="0.0661517">
+        <testcase classname="tests/services.test.js" name="API contract &gt; uses the nine existing routes and ID token header" time="0.0096477">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="API contract &gt; never calls the API without a token" time="0.0032071">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="API contract &gt; handles token refresh failure without exposing its details" time="0.0006506">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="API contract &gt; invalidates a rejected session" time="0.0007359">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="API contract &gt; sanitises server failures" time="0.0005515">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="API contract &gt; preserves useful validation errors" time="0.0005657">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="API contract &gt; continues through empty filtered pages" time="0.0008586">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="API contract &gt; rejects repeating cursors rather than hanging" time="0.0006166">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="API contract &gt; cancels obsolete requests" time="0.0016812">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="API contract &gt; reports unreachable API without automatically repeating mutations" time="0.0009431">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="receipt workflow &gt; accepts image/jpeg" time="0.0011747">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="receipt workflow &gt; accepts image/png" time="0.0003688">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="receipt workflow &gt; rejects invalid file {&quot;type&quot;:&quot;application/pdf&quot;,&quot;size&quot;:10}" time="0.000314">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="receipt workflow &gt; rejects invalid file {&quot;type&quot;:&quot;image/gif&quot;,&quot;size&quot;:10}" time="0.000244">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="receipt workflow &gt; rejects invalid file {&quot;type&quot;:&quot;image/png&quot;,&quot;size&quot;:0}" time="0.0002854">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="receipt workflow &gt; rejects invalid file {&quot;type&quot;:&quot;image/png&quot;,&quot;size&quot;:5242881}" time="0.0002499">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="receipt workflow &gt; accepts the exact size boundary" time="0.0002235">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="receipt workflow &gt; sends signed fields unchanged with file last and no JWT" time="0.001991">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="receipt workflow &gt; rejects S3 upload failure" time="0.0010585">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="receipt workflow &gt; does not treat pending/processing as successful extraction" time="0.0004909">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="receipt workflow &gt; returns terminal extraction failure" time="0.0002767">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="receipt workflow &gt; bounds polling and leaves an unknown final state" time="0.0003643">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="receipt workflow &gt; cancels polling" time="0.0003963">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="financial validation and demo isolation &gt; rejects invalid money -1" time="0.0002703">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="financial validation and demo isolation &gt; rejects invalid money 1.001" time="0.0001904">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="financial validation and demo isolation &gt; rejects invalid money NaN" time="0.0002324">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="financial validation and demo isolation &gt; rejects invalid money Infinity" time="0.0001949">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="financial validation and demo isolation &gt; rejects invalid money 100000001" time="0.000197">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="financial validation and demo isolation &gt; adds cents exactly" time="0.0002266">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="financial validation and demo isolation &gt; uses Sydney date at the UTC boundary" time="0.023443">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="financial validation and demo isolation &gt; rejects invalid API date 2026-02-30" time="0.0004024">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="financial validation and demo isolation &gt; rejects invalid API date 2026-13-01" time="0.0002937">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="financial validation and demo isolation &gt; rejects invalid API date 04/11/2024" time="0.0002862">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="financial validation and demo isolation &gt; persists demo interactions without network calls" time="0.0047742">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="financial validation and demo isolation &gt; keeps budgets separate by month" time="0.0029688">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="production separation &gt; defaults to real mode" time="0.0003317">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="production separation &gt; requires an explicit dev flag" time="0.0002038">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="production separation &gt; rejects demo at production runtime" time="0.0004662">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="production separation &gt; blocks demo build regardless of Vite mode name" time="0.00051">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="production separation &gt; blocks development NODE_ENV build bypass" time="0.0003463">
+        </testcase>
+        <testcase classname="tests/services.test.js" name="production separation &gt; permits production build and flags missing AWS config" time="0.0006683">
+        </testcase>
+    </testsuite>
+</testsuites>

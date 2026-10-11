@@ -7,7 +7,7 @@ export default defineConfig({
   timeout: 30000,
   reporter: [
     ["list"],
-    ["junit", { outputFile: "../../report/stage3-browser-results.xml" }],
+    ["junit", { outputFile: "../../report/browser-results.xml" }],
   ],
   use: {
     baseURL: "http://127.0.0.1:5173",

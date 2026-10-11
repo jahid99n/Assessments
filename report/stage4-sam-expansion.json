@@ -1,0 +1,180 @@
+﻿{
+  "expandedResources": 44,
+  "permissions": {
+    "ApiFunctionGetBudgetPermission": {
+      "Action": "lambda:InvokeFunction",
+      "FunctionName": {
+        "Ref": "ApiFunction"
+      },
+      "Principal": "apigateway.amazonaws.com",
+      "SourceArn": {
+        "Fn::Sub": [
+          "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/budget",
+          {
+            "__ApiId__": {
+              "Ref": "Api"
+            },
+            "__Stage__": "*"
+          }
+        ]
+      }
+    },
+    "ApiFunctionCreatePermission": {
+      "Action": "lambda:InvokeFunction",
+      "FunctionName": {
+        "Ref": "ApiFunction"
+      },
+      "Principal": "apigateway.amazonaws.com",
+      "SourceArn": {
+        "Fn::Sub": [
+          "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/expenses",
+          {
+            "__ApiId__": {
+              "Ref": "Api"
+            },
+            "__Stage__": "*"
+          }
+        ]
+      }
+    },
+    "ApiFunctionPutBudgetPermission": {
+      "Action": "lambda:InvokeFunction",
+      "FunctionName": {
+        "Ref": "ApiFunction"
+      },
+      "Principal": "apigateway.amazonaws.com",
+      "SourceArn": {
+        "Fn::Sub": [
+          "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/budget",
+          {
+            "__ApiId__": {
+              "Ref": "Api"
+            },
+            "__Stage__": "*"
+          }
+        ]
+      }
+    },
+    "ApiFunctionDeletePermission": {
+      "Action": "lambda:InvokeFunction",
+      "FunctionName": {
+        "Ref": "ApiFunction"
+      },
+      "Principal": "apigateway.amazonaws.com",
+      "SourceArn": {
+        "Fn::Sub": [
+          "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/DELETE/expenses/*",
+          {
+            "__ApiId__": {
+              "Ref": "Api"
+            },
+            "__Stage__": "*"
+          }
+        ]
+      }
+    },
+    "ApiFunctionListPermission": {
+      "Action": "lambda:InvokeFunction",
+      "FunctionName": {
+        "Ref": "ApiFunction"
+      },
+      "Principal": "apigateway.amazonaws.com",
+      "SourceArn": {
+        "Fn::Sub": [
+          "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/expenses",
+          {
+            "__ApiId__": {
+              "Ref": "Api"
+            },
+            "__Stage__": "*"
+          }
+        ]
+      }
+    },
+    "ApiFunctionUploadPermission": {
+      "Action": "lambda:InvokeFunction",
+      "FunctionName": {
+        "Ref": "ApiFunction"
+      },
+      "Principal": "apigateway.amazonaws.com",
+      "SourceArn": {
+        "Fn::Sub": [
+          "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/upload-url",
+          {
+            "__ApiId__": {
+              "Ref": "Api"
+            },
+            "__Stage__": "*"
+          }
+        ]
+      }
+    },
+    "ApiFunctionStatsPermission": {
+      "Action": "lambda:InvokeFunction",
+      "FunctionName": {
+        "Ref": "ApiFunction"
+      },
+      "Principal": "apigateway.amazonaws.com",
+      "SourceArn": {
+        "Fn::Sub": [
+          "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/stats",
+          {
+            "__ApiId__": {
+              "Ref": "Api"
+            },
+            "__Stage__": "*"
+          }
+        ]
+      }
+    },
+    "ProcessorInvokePermission": {
+      "Action": "lambda:InvokeFunction",
+      "FunctionName": {
+        "Ref": "ProcessorFunction"
+      },
+      "Principal": "s3.amazonaws.com",
+      "SourceAccount": {
+        "Ref": "AWS::AccountId"
+      },
+      "SourceArn": {
+        "Fn::Sub": "arn:${AWS::Partition}:s3:::${ProjectName}-${AWS::AccountId}-${AWS::Region}-receipts"
+      }
+    },
+    "ApiFunctionEditPermission": {
+      "Action": "lambda:InvokeFunction",
+      "FunctionName": {
+        "Ref": "ApiFunction"
+      },
+      "Principal": "apigateway.amazonaws.com",
+      "SourceArn": {
+        "Fn::Sub": [
+          "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/expenses/*",
+          {
+            "__ApiId__": {
+              "Ref": "Api"
+            },
+            "__Stage__": "*"
+          }
+        ]
+      }
+    },
+    "ApiFunctionDetailPermission": {
+      "Action": "lambda:InvokeFunction",
+      "FunctionName": {
+        "Ref": "ApiFunction"
+      },
+      "Principal": "apigateway.amazonaws.com",
+      "SourceArn": {
+        "Fn::Sub": [
+          "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/expenses/*",
+          {
+            "__ApiId__": {
+              "Ref": "Api"
+            },
+            "__Stage__": "*"
+          }
+        ]
+      }
+    }
+  }
+}

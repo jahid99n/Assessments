@@ -44,7 +44,8 @@ def error_code(error):
 
 
 def aws(name):
-    return boto3.client(name, region_name=os.getenv("AWS_DEFAULT_REGION", "ap-southeast-2"), config=Config(signature_version="s3v4" if name == "s3" else "v4", connect_timeout=3, read_timeout=5, retries={"max_attempts": 1}))
+    # Regional virtual-host URLs avoid global-endpoint redirects on browser POSTs.
+    return boto3.client(name, region_name=os.getenv("AWS_DEFAULT_REGION", "ap-southeast-2"), config=Config(signature_version="s3v4" if name == "s3" else "v4", s3={"addressing_style": "virtual"} if name == "s3" else None, connect_timeout=3, read_timeout=5, retries={"max_attempts": 1}))
 
 
 def encode(value):

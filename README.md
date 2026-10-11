@@ -1,7 +1,9 @@
 # Smart Expense Tracker — ICT5205 Assignment 3
 
-AWS serverless expense tracking with receipt extraction. **Stage 2 backend only:**
-implemented and tested locally with mocked AWS; no frontend or deployed service yet.
+AWS serverless expense tracking with receipt extraction. **Stage 4: local integration
+and deployment preparation.** The Python backend and React frontend are implemented;
+local full-stack tests use simulated AWS. Infrastructure is prepared but nothing
+has been deployed. Live AWS deployment requires explicit approval.
 
 The architecture uses Amplify Hosting, Cognito, API Gateway, Lambda, DynamoDB, S3,
 Textract, SNS, EventBridge Scheduler and CloudWatch. Three Lambda handlers separate
@@ -33,6 +35,13 @@ OCR evidence. Do not remove the transport block to make a failing test pass.
 
 - `code/backend/`: Lambda handlers and small shared modules; see `API_CONTRACT.md`.
 - `code/tests/`: pytest tests for routes, parsing, receipts, SNS isolation and weeks.
+- `code/frontend/`: React/Vite dashboard, Cognito adapter and explicit offline demo.
+- `code/integration/` and `code/frontend/integration/`: localhost-only full-stack test harness; never deploy.
+- `infrastructure/template.yaml`: SAM/CloudFormation, Sydney, private email disabled by default.
+- `amplify.yml`, `customHttp.yml`: prepared static hosting build and security headers.
+- `report/Stage4_Integration_Testing_Report.md`: current executed evidence and limitations.
+- `report/AWS_Deployment_Guide.md`: installation, approval-gated deployment, verification and cleanup.
+- `report/AWS_Cost_Estimate.md`, `report/Security_Review.md`: assumptions, controls and live verification gates.
 - `report/Stage2_Testing_Report.md`: executed results and known evidence limits.
 - `Phase2_Design_Addendum.md`: approved corrections and deployment prerequisites.
 - `.env.example`: configuration names, not credentials; tests set their own values.
@@ -52,10 +61,51 @@ BUCKET, TOPIC_ARN; region defaults to ap-southeast-2. ALLOWED_ORIGIN configures 
 response origin. Private email is disabled unless PRIVATE_EMAIL_ENABLED=true;
 read the addendum before enabling it in any real environment.
 
-S3 versioning is mandatory. API Gateway must authenticate every route. Lambda
-roles must be the only permitted application mutation path. Future SAM templates
-will provision these settings; no deployment command is provided or run in Stage 2.
+S3 versioning is mandatory. API Gateway authenticates every route in the prepared
+template. Application roles must be the controlled mutation path. The deployment
+guide contains future commands, but none were executed during local development.
 
-Stage 3 frontend, demo mode, comprehensive manuals and deployment preparation are
-pending separate approval. This directory currently has no `.git` metadata; no
-commit, branch switch or push was performed.
+## Frontend and integration testing
+
+From project root:
+
+```powershell
+Set-Location code/frontend
+npm.cmd ci
+npm.cmd run demo
+```
+
+Open http://127.0.0.1:5173. This development-only demo uses labelled synthetic data
+and local storage, not AWS. Stop the development server with Ctrl+C when finished.
+See [frontend instructions](code/frontend/README.md) for Cognito configuration and
+the user walkthrough. Production builds reject demo mode and contain no test harness.
+
+From `code/frontend`, run these checks sequentially:
+
+```powershell
+npm.cmd test
+npm.cmd run lint
+npm.cmd run test:browser
+npm.cmd run test:integration
+npm.cmd run build
+npm.cmd run test:build
+```
+
+Browser checks require installed Microsoft Edge. Full-stack integration automatically
+starts localhost frontend/backend servers on ports 5180/5181. The real React API
+adapter, Python API, receipt parser/processor and DynamoDB access code execute; only
+AWS boundaries are simulated. No real JWT verification or OCR accuracy is claimed.
+Run production build checks before adding actual AWS variables to `.env.local`.
+
+From project root, validate the infrastructure without an AWS account:
+
+```powershell
+uv run --frozen cfn-lint infrastructure/template.yaml --region ap-southeast-2
+```
+
+SAM CLI/container validation remains a deployment prerequisite; consult the
+[deployment guide](report/AWS_Deployment_Guide.md). Preserve both the original
+design and [Stage 4 addendum](Phase4_Integration_Addendum.md). Source changes are
+tracked on branch `main`; no AWS deployment has been performed. The
+[IAM preparation guide](infrastructure/iam/README.md) supplies the scoped deployment
+policies, administrator setup steps and commands for the dedicated execution role.

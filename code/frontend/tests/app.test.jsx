@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import App from "../src/App.jsx";
 import { RuntimeProvider } from "../src/runtime.jsx";
 import { createDemoApi, createDemoAuth, DEMO_KEY } from "../src/lib/demo.js";
@@ -19,6 +19,12 @@ vi.mock("recharts", async (importOriginal) => ({
   ResponsiveContainer: ({ children }) =>
     cloneElement(children, { width: 600, height: 250 }),
 }));
+
+// Compile the real lazy chart module before timing DOM assertions. Cold Vite
+// compilation is not a UI response-time test; browser tests cover lazy loading.
+beforeAll(async () => {
+  await import("../src/pages/Dashboard.jsx");
+}, 30000);
 
 function mount(path = "/", overrides = {}) {
   const api = createDemoApi();

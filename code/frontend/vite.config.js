@@ -6,6 +6,7 @@ export default defineConfig(({ command, mode }) => {
   const env = { ...loadEnv(mode, process.cwd(), ""), ...process.env };
   assertBuildMode(command, env.VITE_APP_MODE, env.NODE_ENV);
   return {
+    cacheDir: `node_modules/.vite-${mode}`,
     plugins: [react()],
     build: { sourcemap: false },
     test: {
@@ -13,7 +14,7 @@ export default defineConfig(({ command, mode }) => {
       setupFiles: ["./tests/setup.js"],
       include: ["tests/**/*.test.{js,jsx}"],
       reporters: ["default", "junit"],
-      outputFile: { junit: "../../report/stage3-vitest.xml" },
+      outputFile: { junit: "../../report/frontend-results.xml" },
     },
   };
 });

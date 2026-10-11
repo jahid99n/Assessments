@@ -48,6 +48,8 @@ const scripts = (
 for (const forbidden of [
   "smart-expense-demo-v1",
   "DEMO_NO_NETWORK",
+  "integrationApi",
+  "local-alice",
   "Previous month sample",
   "Demo receipt · simulated",
 ])
@@ -110,7 +112,7 @@ try {
   server.kill();
 }
 await writeFile(
-  "../../report/stage3-build-checks.json",
+  "../../report/build-checks.json",
   JSON.stringify(
     { checks: results.length, passed: results.length, failed: 0, results },
     null,

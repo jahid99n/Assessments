@@ -1,0 +1,1650 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "OFFLINE STRUCTURAL VALIDATION ONLY - placeholder artifacts, DO NOT DEPLOY",
+  "Parameters": {
+    "ProjectName": {
+      "Type": "String",
+      "Default": "smart-expense",
+      "AllowedPattern": "[a-z][a-z0-9-]{2,24}"
+    },
+    "FrontendOrigin": {
+      "Type": "String",
+      "AllowedPattern": "https://[a-zA-Z0-9.-]+",
+      "Description": "Exact Amplify HTTPS origin, without trailing slash"
+    },
+    "PrivateEmailEnabled": {
+      "Type": "String",
+      "Default": "false",
+      "AllowedValues": [
+        "false",
+        "true"
+      ],
+      "Description": "Enable only after the documented account/IAM and two-user isolation checks"
+    }
+  },
+  "Rules": {
+    "SydneyOnly": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Equals": [
+              {
+                "Ref": "AWS::Region"
+              },
+              "ap-southeast-2"
+            ]
+          },
+          "AssertDescription": "Deploy in Sydney"
+        }
+      ]
+    }
+  },
+  "Resources": {
+    "UserDomain": {
+      "Type": "AWS::Cognito::UserPoolDomain",
+      "Properties": {
+        "Domain": {
+          "Fn::Sub": "${ProjectName}-${AWS::AccountId}"
+        },
+        "UserPoolId": {
+          "Ref": "Users"
+        },
+        "ManagedLoginVersion": 2
+      }
+    },
+    "WeeklySchedule": {
+      "Type": "AWS::Scheduler::Schedule",
+      "Properties": {
+        "GroupName": {
+          "Ref": "ScheduleGroup"
+        },
+        "ScheduleExpression": "cron(0 9 ? * MON *)",
+        "ScheduleExpressionTimezone": "Australia/Sydney",
+        "FlexibleTimeWindow": {
+          "Mode": "OFF"
+        },
+        "State": "ENABLED",
+        "Target": {
+          "Arn": {
+            "Fn::GetAtt": [
+              "SummaryFunction",
+              "Arn"
+            ]
+          },
+          "RoleArn": {
+            "Fn::GetAtt": [
+              "SchedulerRole",
+              "Arn"
+            ]
+          },
+          "Input": "{\"scheduledTime\":\"<aws.scheduler.scheduled-time>\"}",
+          "RetryPolicy": {
+            "MaximumEventAgeInSeconds": 21600,
+            "MaximumRetryAttempts": 2
+          }
+        }
+      }
+    },
+    "Alerts": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "TopicName": {
+          "Fn::Sub": "${ProjectName}-expense-alerts"
+        }
+      }
+    },
+    "ApiFunctionLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Sub": "/aws/lambda/${ProjectName}-expense-api"
+        },
+        "RetentionInDays": 14
+      }
+    },
+    "ReceiptPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "Receipts"
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyInsecureTransport",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:*",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "Receipts",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": "${Receipts.Arn}/*"
+                }
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": "false"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "ProcessorRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "ReceiptData",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:Query"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "Expenses",
+                      "Arn"
+                    ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "Budgets",
+                      "Arn"
+                    ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sns:Publish",
+                    "sns:ListSubscriptionsByTopic",
+                    "sns:GetSubscriptionAttributes"
+                  ],
+                  "Resource": {
+                    "Ref": "Alerts"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:GetObjectVersion",
+                    "s3:DeleteObjectVersion"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::${ProjectName}-${AWS::AccountId}-${AWS::Region}-receipts/receipts/*"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "textract:AnalyzeExpense",
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProjectName}-receipt-processor:*"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "Users": {
+      "Type": "AWS::Cognito::UserPool",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "UserPoolName": {
+          "Fn::Sub": "${ProjectName}-users"
+        },
+        "UserPoolTier": "ESSENTIALS",
+        "UsernameAttributes": [
+          "email"
+        ],
+        "AutoVerifiedAttributes": [
+          "email"
+        ],
+        "UsernameConfiguration": {
+          "CaseSensitive": false
+        },
+        "Policies": {
+          "PasswordPolicy": {
+            "MinimumLength": 12,
+            "RequireLowercase": true,
+            "RequireUppercase": true,
+            "RequireNumbers": true,
+            "RequireSymbols": true
+          }
+        },
+        "AccountRecoverySetting": {
+          "RecoveryMechanisms": [
+            {
+              "Name": "verified_email",
+              "Priority": 1
+            }
+          ]
+        },
+        "UserAttributeUpdateSettings": {
+          "AttributesRequireVerificationBeforeUpdate": [
+            "email"
+          ]
+        }
+      }
+    },
+    "ApiFunctionGetBudgetPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/budget",
+            {
+              "__ApiId__": {
+                "Ref": "Api"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
+    "ApiFunctionCreatePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/expenses",
+            {
+              "__ApiId__": {
+                "Ref": "Api"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
+    "ProcessorNotificationFailures": {
+      "Type": "AWS::Logs::MetricFilter",
+      "Properties": {
+        "LogGroupName": {
+          "Ref": "ProcessorLogs"
+        },
+        "FilterPattern": "?notification_blocked_or_failed ?notification_delivery_unknown ?budget_check_failed ?receipt_failure_state_unavailable",
+        "MetricTransformations": [
+          {
+            "MetricNamespace": "SmartExpense",
+            "MetricName": {
+              "Fn::Sub": "${ProjectName}-notification-failures"
+            },
+            "MetricValue": "1"
+          }
+        ]
+      }
+    },
+    "AlertsPolicy": {
+      "Type": "AWS::SNS::TopicPolicy",
+      "Properties": {
+        "Topics": [
+          {
+            "Ref": "Alerts"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "OnlyApplicationPublishers",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "sns:Publish",
+              "Resource": {
+                "Ref": "Alerts"
+              },
+              "Condition": {
+                "ArnNotEquals": {
+                  "aws:PrincipalArn": [
+                    {
+                      "Fn::GetAtt": [
+                        "ApiRole",
+                        "Arn"
+                      ]
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ProcessorRole",
+                        "Arn"
+                      ]
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "SummaryRole",
+                        "Arn"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "Sid": "OnlyCoordinatedSubscriptions",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "sns:Subscribe",
+              "Resource": {
+                "Ref": "Alerts"
+              },
+              "Condition": {
+                "ArnNotEquals": {
+                  "aws:PrincipalArn": {
+                    "Fn::GetAtt": [
+                      "ApiRole",
+                      "Arn"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "NotificationFailures": {
+      "Type": "AWS::Logs::MetricFilter",
+      "Properties": {
+        "LogGroupName": {
+          "Ref": "ApiFunctionLogs"
+        },
+        "FilterPattern": "?notification_blocked_or_failed ?notification_delivery_unknown ?budget_check_failed ?api_failure",
+        "MetricTransformations": [
+          {
+            "MetricNamespace": "SmartExpense",
+            "MetricName": {
+              "Fn::Sub": "${ProjectName}-notification-failures"
+            },
+            "MetricValue": "1"
+          }
+        ]
+      }
+    },
+    "Api": {
+      "Type": "AWS::ApiGatewayV2::Api",
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0",
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          },
+          "paths": {
+            "/expenses/{id}": {
+              "put": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                  },
+                  "payloadFormatVersion": "2.0"
+                },
+                "security": [
+                  {
+                    "Cognito": []
+                  }
+                ],
+                "parameters": [
+                  {
+                    "required": true,
+                    "name": "id",
+                    "in": "path"
+                  }
+                ],
+                "responses": {}
+              },
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                  },
+                  "payloadFormatVersion": "2.0"
+                },
+                "security": [
+                  {
+                    "Cognito": []
+                  }
+                ],
+                "parameters": [
+                  {
+                    "required": true,
+                    "name": "id",
+                    "in": "path"
+                  }
+                ],
+                "responses": {}
+              },
+              "delete": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                  },
+                  "payloadFormatVersion": "2.0"
+                },
+                "security": [
+                  {
+                    "Cognito": []
+                  }
+                ],
+                "parameters": [
+                  {
+                    "required": true,
+                    "name": "id",
+                    "in": "path"
+                  }
+                ],
+                "responses": {}
+              }
+            },
+            "/stats": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                  },
+                  "payloadFormatVersion": "2.0"
+                },
+                "security": [
+                  {
+                    "Cognito": []
+                  }
+                ],
+                "responses": {}
+              }
+            },
+            "/budget": {
+              "put": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                  },
+                  "payloadFormatVersion": "2.0"
+                },
+                "security": [
+                  {
+                    "Cognito": []
+                  }
+                ],
+                "responses": {}
+              },
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                  },
+                  "payloadFormatVersion": "2.0"
+                },
+                "security": [
+                  {
+                    "Cognito": []
+                  }
+                ],
+                "responses": {}
+              }
+            },
+            "/expenses": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                  },
+                  "payloadFormatVersion": "2.0"
+                },
+                "security": [
+                  {
+                    "Cognito": []
+                  }
+                ],
+                "responses": {}
+              },
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                  },
+                  "payloadFormatVersion": "2.0"
+                },
+                "security": [
+                  {
+                    "Cognito": []
+                  }
+                ],
+                "responses": {}
+              }
+            },
+            "/upload-url": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                  },
+                  "payloadFormatVersion": "2.0"
+                },
+                "security": [
+                  {
+                    "Cognito": []
+                  }
+                ],
+                "responses": {}
+              }
+            }
+          },
+          "x-amazon-apigateway-cors": {
+            "allowOrigins": [
+              "https://example.invalid"
+            ],
+            "allowHeaders": [
+              "Authorization",
+              "Content-Type"
+            ],
+            "allowMethods": [
+              "GET",
+              "POST",
+              "PUT",
+              "DELETE",
+              "OPTIONS"
+            ],
+            "maxAge": 300
+          },
+          "tags": [
+            {
+              "name": "httpapi:createdBy",
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ],
+          "openapi": "3.0.1",
+          "components": {
+            "securitySchemes": {
+              "Cognito": {
+                "type": "oauth2",
+                "x-amazon-apigateway-authorizer": {
+                  "jwtConfiguration": {
+                    "audience": [
+                      {
+                        "Ref": "UserClient"
+                      }
+                    ],
+                    "issuer": {
+                      "Fn::Sub": "https://cognito-idp.${AWS::Region}.amazonaws.com/${Users}"
+                    }
+                  },
+                  "identitySource": "$request.header.Authorization",
+                  "type": "jwt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ApiLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "RetentionInDays": 14
+      }
+    },
+    "ApiFunctionPutBudgetPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/budget",
+            {
+              "__ApiId__": {
+                "Ref": "Api"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
+    "LoginBranding": {
+      "Type": "AWS::Cognito::ManagedLoginBranding",
+      "Properties": {
+        "UserPoolId": {
+          "Ref": "Users"
+        },
+        "ClientId": {
+          "Ref": "UserClient"
+        },
+        "UseCognitoProvidedValues": true
+      }
+    },
+    "ApiErrors": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "Namespace": "AWS/Lambda",
+        "MetricName": "Errors",
+        "Dimensions": [
+          {
+            "Name": "FunctionName",
+            "Value": {
+              "Ref": "ApiFunction"
+            }
+          }
+        ],
+        "Statistic": "Sum",
+        "Period": 300,
+        "EvaluationPeriods": 1,
+        "Threshold": 1,
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "TreatMissingData": "notBreaching"
+      }
+    },
+    "NotificationAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "Namespace": "SmartExpense",
+        "MetricName": {
+          "Fn::Sub": "${ProjectName}-notification-failures"
+        },
+        "Statistic": "Sum",
+        "Period": 300,
+        "EvaluationPeriods": 1,
+        "Threshold": 1,
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "TreatMissingData": "notBreaching"
+      }
+    },
+    "Receipts": {
+      "Type": "AWS::S3::Bucket",
+      "DependsOn": "ProcessorInvokePermission",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "BucketName": {
+          "Fn::Sub": "${ProjectName}-${AWS::AccountId}-${AWS::Region}-receipts"
+        },
+        "VersioningConfiguration": {
+          "Status": "Enabled"
+        },
+        "NotificationConfiguration": {
+          "LambdaConfigurations": [
+            {
+              "Event": "s3:ObjectCreated:*",
+              "Function": {
+                "Fn::GetAtt": [
+                  "ProcessorFunction",
+                  "Arn"
+                ]
+              },
+              "Filter": {
+                "S3Key": {
+                  "Rules": [
+                    {
+                      "Name": "prefix",
+                      "Value": "receipts/"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "OwnershipControls": {
+          "Rules": [
+            {
+              "ObjectOwnership": "BucketOwnerEnforced"
+            }
+          ]
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "CorsConfiguration": {
+          "CorsRules": [
+            {
+              "AllowedOrigins": [
+                {
+                  "Ref": "FrontendOrigin"
+                }
+              ],
+              "AllowedMethods": [
+                "POST",
+                "GET",
+                "HEAD"
+              ],
+              "AllowedHeaders": [
+                "Content-Type"
+              ],
+              "MaxAge": 300
+            }
+          ]
+        },
+        "LifecycleConfiguration": {
+          "Rules": [
+            {
+              "Id": "ReceiptRetention",
+              "Status": "Enabled",
+              "Prefix": "receipts/",
+              "ExpirationInDays": 365,
+              "NoncurrentVersionExpiration": {
+                "NoncurrentDays": 365
+              },
+              "AbortIncompleteMultipartUpload": {
+                "DaysAfterInitiation": 1
+              }
+            }
+          ]
+        }
+      }
+    },
+    "UserClient": {
+      "Type": "AWS::Cognito::UserPoolClient",
+      "Properties": {
+        "UserPoolId": {
+          "Ref": "Users"
+        },
+        "GenerateSecret": false,
+        "AllowedOAuthFlowsUserPoolClient": true,
+        "AllowedOAuthFlows": [
+          "code"
+        ],
+        "AllowedOAuthScopes": [
+          "openid",
+          "email",
+          "profile"
+        ],
+        "SupportedIdentityProviders": [
+          "COGNITO"
+        ],
+        "CallbackURLs": [
+          {
+            "Fn::Sub": "${FrontendOrigin}/auth/callback"
+          }
+        ],
+        "LogoutURLs": [
+          {
+            "Fn::Sub": "${FrontendOrigin}/login"
+          }
+        ],
+        "PreventUserExistenceErrors": "ENABLED",
+        "EnableTokenRevocation": true,
+        "AccessTokenValidity": 60,
+        "IdTokenValidity": 60,
+        "RefreshTokenValidity": 1,
+        "TokenValidityUnits": {
+          "AccessToken": "minutes",
+          "IdToken": "minutes",
+          "RefreshToken": "days"
+        }
+      }
+    },
+    "ProcessorErrors": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "Namespace": "AWS/Lambda",
+        "MetricName": "Errors",
+        "Dimensions": [
+          {
+            "Name": "FunctionName",
+            "Value": {
+              "Ref": "ProcessorFunction"
+            }
+          }
+        ],
+        "Statistic": "Sum",
+        "Period": 300,
+        "EvaluationPeriods": 1,
+        "Threshold": 1,
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "TreatMissingData": "notBreaching"
+      }
+    },
+    "SummaryNotificationFailures": {
+      "Type": "AWS::Logs::MetricFilter",
+      "Properties": {
+        "LogGroupName": {
+          "Ref": "SummaryLogs"
+        },
+        "FilterPattern": "?notification_blocked_or_failed ?notification_delivery_unknown ?weekly_user_failed",
+        "MetricTransformations": [
+          {
+            "MetricNamespace": "SmartExpense",
+            "MetricName": {
+              "Fn::Sub": "${ProjectName}-notification-failures"
+            },
+            "MetricValue": "1"
+          }
+        ]
+      }
+    },
+    "ApiFunctionDeletePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/DELETE/expenses/*",
+            {
+              "__ApiId__": {
+                "Ref": "Api"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
+    "SummaryFunctionEventInvokeConfig": {
+      "Type": "AWS::Lambda::EventInvokeConfig",
+      "Properties": {
+        "DestinationConfig": {},
+        "FunctionName": {
+          "Ref": "SummaryFunction"
+        },
+        "MaximumEventAgeInSeconds": 21600,
+        "MaximumRetryAttempts": 2,
+        "Qualifier": "$LATEST"
+      }
+    },
+    "ApiFunction": {
+      "Type": "AWS::Lambda::Function",
+      "DependsOn": "ApiFunctionLogs",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "offline-placeholder-not-deployed",
+          "S3Key": "backend.zip"
+        },
+        "FunctionName": {
+          "Fn::Sub": "${ProjectName}-expense-api"
+        },
+        "Handler": "expense_api.handler",
+        "MemorySize": 256,
+        "Role": {
+          "Fn::GetAtt": [
+            "ApiRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Timeout": 29,
+        "Environment": {
+          "Variables": {
+            "EXPENSES_TABLE": {
+              "Ref": "Expenses"
+            },
+            "BUDGETS_TABLE": {
+              "Ref": "Budgets"
+            },
+            "BUCKET": {
+              "Fn::Sub": "${ProjectName}-${AWS::AccountId}-${AWS::Region}-receipts"
+            },
+            "TOPIC_ARN": {
+              "Ref": "Alerts"
+            },
+            "ALLOWED_ORIGIN": {
+              "Ref": "FrontendOrigin"
+            },
+            "PRIVATE_EMAIL_ENABLED": {
+              "Ref": "PrivateEmailEnabled"
+            }
+          }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Architectures": [
+          "x86_64"
+        ]
+      }
+    },
+    "ApiFunctionListPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/expenses",
+            {
+              "__ApiId__": {
+                "Ref": "Api"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
+    "Budgets": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "userId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "userId",
+            "KeyType": "HASH"
+          }
+        ],
+        "SSESpecification": {
+          "SSEEnabled": true
+        }
+      }
+    },
+    "ApiFunctionUploadPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/upload-url",
+            {
+              "__ApiId__": {
+                "Ref": "Api"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
+    "ApiApiGatewayDefaultStage": {
+      "Type": "AWS::ApiGatewayV2::Stage",
+      "Properties": {
+        "AccessLogSettings": {
+          "DestinationArn": {
+            "Fn::GetAtt": [
+              "ApiLogs",
+              "Arn"
+            ]
+          },
+          "Format": "{\"requestId\":\"$context.requestId\",\"route\":\"$context.routeKey\",\"status\":\"$context.status\",\"integrationError\":\"$context.integrationErrorMessage\"}"
+        },
+        "DefaultRouteSettings": {
+          "ThrottlingBurstLimit": 20,
+          "ThrottlingRateLimit": 10
+        },
+        "ApiId": {
+          "Ref": "Api"
+        },
+        "StageName": "$default",
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        },
+        "AutoDeploy": true
+      }
+    },
+    "ApiFunctionStatsPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/stats",
+            {
+              "__ApiId__": {
+                "Ref": "Api"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
+    "SummaryFunction": {
+      "Type": "AWS::Lambda::Function",
+      "DependsOn": "SummaryLogs",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "offline-placeholder-not-deployed",
+          "S3Key": "backend.zip"
+        },
+        "FunctionName": {
+          "Fn::Sub": "${ProjectName}-weekly-summary"
+        },
+        "Handler": "weekly_summary.handler",
+        "MemorySize": 256,
+        "Role": {
+          "Fn::GetAtt": [
+            "SummaryRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Timeout": 60,
+        "Environment": {
+          "Variables": {
+            "EXPENSES_TABLE": {
+              "Ref": "Expenses"
+            },
+            "BUDGETS_TABLE": {
+              "Ref": "Budgets"
+            },
+            "BUCKET": {
+              "Fn::Sub": "${ProjectName}-${AWS::AccountId}-${AWS::Region}-receipts"
+            },
+            "TOPIC_ARN": {
+              "Ref": "Alerts"
+            },
+            "ALLOWED_ORIGIN": {
+              "Ref": "FrontendOrigin"
+            },
+            "PRIVATE_EMAIL_ENABLED": {
+              "Ref": "PrivateEmailEnabled"
+            }
+          }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Architectures": [
+          "x86_64"
+        ]
+      }
+    },
+    "ScheduleGroup": {
+      "Type": "AWS::Scheduler::ScheduleGroup"
+    },
+    "SummaryLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Sub": "/aws/lambda/${ProjectName}-weekly-summary"
+        },
+        "RetentionInDays": 14
+      }
+    },
+    "ApiRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "ApiData",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:Query"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "Expenses",
+                      "Arn"
+                    ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "Budgets",
+                      "Arn"
+                    ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sns:Publish",
+                    "sns:ListSubscriptionsByTopic",
+                    "sns:GetSubscriptionAttributes"
+                  ],
+                  "Resource": {
+                    "Ref": "Alerts"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sns:Subscribe",
+                    "sns:Unsubscribe"
+                  ],
+                  "Resource": {
+                    "Ref": "Alerts"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject",
+                    "s3:GetObject",
+                    "s3:GetObjectVersion",
+                    "s3:DeleteObjectVersion"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::${ProjectName}-${AWS::AccountId}-${AWS::Region}-receipts/receipts/*"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "s3:ListBucketVersions",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::${ProjectName}-${AWS::AccountId}-${AWS::Region}-receipts"
+                  },
+                  "Condition": {
+                    "StringLike": {
+                      "s3:prefix": "receipts/*"
+                    }
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProjectName}-expense-api:*"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "ProcessorInvokePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ProcessorFunction"
+        },
+        "Principal": "s3.amazonaws.com",
+        "SourceAccount": {
+          "Ref": "AWS::AccountId"
+        },
+        "SourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:s3:::${ProjectName}-${AWS::AccountId}-${AWS::Region}-receipts"
+        }
+      }
+    },
+    "ProcessorFunctionEventInvokeConfig": {
+      "Type": "AWS::Lambda::EventInvokeConfig",
+      "Properties": {
+        "DestinationConfig": {},
+        "FunctionName": {
+          "Ref": "ProcessorFunction"
+        },
+        "MaximumEventAgeInSeconds": 21600,
+        "MaximumRetryAttempts": 2,
+        "Qualifier": "$LATEST"
+      }
+    },
+    "ProcessorFunction": {
+      "Type": "AWS::Lambda::Function",
+      "DependsOn": "ProcessorLogs",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "offline-placeholder-not-deployed",
+          "S3Key": "backend.zip"
+        },
+        "FunctionName": {
+          "Fn::Sub": "${ProjectName}-receipt-processor"
+        },
+        "Handler": "receipt_processor.handler",
+        "MemorySize": 256,
+        "Role": {
+          "Fn::GetAtt": [
+            "ProcessorRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.12",
+        "Timeout": 60,
+        "Environment": {
+          "Variables": {
+            "EXPENSES_TABLE": {
+              "Ref": "Expenses"
+            },
+            "BUDGETS_TABLE": {
+              "Ref": "Budgets"
+            },
+            "BUCKET": {
+              "Fn::Sub": "${ProjectName}-${AWS::AccountId}-${AWS::Region}-receipts"
+            },
+            "TOPIC_ARN": {
+              "Ref": "Alerts"
+            },
+            "ALLOWED_ORIGIN": {
+              "Ref": "FrontendOrigin"
+            },
+            "PRIVATE_EMAIL_ENABLED": {
+              "Ref": "PrivateEmailEnabled"
+            }
+          }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Architectures": [
+          "x86_64"
+        ]
+      }
+    },
+    "Expenses": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "userId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "expenseId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "userId",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "expenseId",
+            "KeyType": "RANGE"
+          }
+        ],
+        "SSESpecification": {
+          "SSEEnabled": true
+        }
+      }
+    },
+    "ProcessorLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Sub": "/aws/lambda/${ProjectName}-receipt-processor"
+        },
+        "RetentionInDays": 14
+      }
+    },
+    "SummaryRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "SummaryData",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "dynamodb:Query",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "Expenses",
+                      "Arn"
+                    ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "Budgets",
+                      "Arn"
+                    ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "dynamodb:Scan",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "Budgets",
+                      "Arn"
+                    ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sns:Publish",
+                    "sns:ListSubscriptionsByTopic",
+                    "sns:GetSubscriptionAttributes"
+                  ],
+                  "Resource": {
+                    "Ref": "Alerts"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProjectName}-weekly-summary:*"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "SchedulerRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "scheduler.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole",
+              "Condition": {
+                "StringEquals": {
+                  "aws:SourceAccount": {
+                    "Ref": "AWS::AccountId"
+                  }
+                },
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Fn::GetAtt": [
+                      "ScheduleGroup",
+                      "Arn"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "InvokeSummary",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "lambda:InvokeFunction",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "SummaryFunction",
+                      "Arn"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "ApiFunctionEditPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/expenses/*",
+            {
+              "__ApiId__": {
+                "Ref": "Api"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
+    "ApiFunctionDetailPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/expenses/*",
+            {
+              "__ApiId__": {
+                "Ref": "Api"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
+    "SummaryErrors": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "Namespace": "AWS/Lambda",
+        "MetricName": "Errors",
+        "Dimensions": [
+          {
+            "Name": "FunctionName",
+            "Value": {
+              "Ref": "SummaryFunction"
+            }
+          }
+        ],
+        "Statistic": "Sum",
+        "Period": 300,
+        "EvaluationPeriods": 1,
+        "Threshold": 1,
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "TreatMissingData": "notBreaching"
+      }
+    }
+  },
+  "Outputs": {
+    "ApiUrl": {
+      "Value": {
+        "Fn::Sub": "https://${Api}.execute-api.${AWS::Region}.amazonaws.com"
+      }
+    },
+    "UserPoolId": {
+      "Value": {
+        "Ref": "Users"
+      }
+    },
+    "UserClientId": {
+      "Value": {
+        "Ref": "UserClient"
+      }
+    },
+    "CognitoDomain": {
+      "Value": {
+        "Fn::Sub": "${UserDomain}.auth.${AWS::Region}.amazoncognito.com"
+      }
+    },
+    "ReceiptBucket": {
+      "Value": {
+        "Ref": "Receipts"
+      }
+    },
+    "ExpensesTable": {
+      "Value": {
+        "Ref": "Expenses"
+      }
+    },
+    "BudgetsTable": {
+      "Value": {
+        "Ref": "Budgets"
+      }
+    },
+    "AlertsTopic": {
+      "Value": {
+        "Ref": "Alerts"
+      }
+    },
+    "WeeklyScheduleName": {
+      "Value": {
+        "Ref": "WeeklySchedule"
+      }
+    },
+    "WeeklyScheduleGroup": {
+      "Value": {
+        "Ref": "ScheduleGroup"
+      }
+    }
+  }
+}

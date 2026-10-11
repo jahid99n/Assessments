@@ -1,0 +1,40 @@
+<testsuites id="" name="" tests="6" failures="0" skipped="0" errors="0" time="37.927008">
+<testsuite name="full-stack.spec.js" timestamp="2026-10-11T02:43:35.576Z" hostname="" tests="6" failures="0" skipped="0" time="31.583" errors="0">
+<testcase name="real JS adapter exercises nine Python routes, totals, paging and isolation" classname="full-stack.spec.js" time="3.626">
+<properties>
+<property name="serial" value="">
+</property>
+</properties>
+</testcase>
+<testcase name="React manual expense form saves and edits real backend records" classname="full-stack.spec.js" time="3.128">
+<properties>
+<property name="serial" value="">
+</property>
+</properties>
+</testcase>
+<testcase name="React → signed POST → processor → DynamoDB → dashboard; replay and duplicate protection" classname="full-stack.spec.js" time="8.592">
+<properties>
+<property name="serial" value="">
+</property>
+</properties>
+</testcase>
+<testcase name="PNG and Australian day-first dates traverse real processor and UI" classname="full-stack.spec.js" time="3.98">
+<properties>
+<property name="serial" value="">
+</property>
+</properties>
+</testcase>
+<testcase name="missing fields fail visibly; transient failure safely recovers on original event replay" classname="full-stack.spec.js" time="6.813">
+<properties>
+<property name="serial" value="">
+</property>
+</properties>
+</testcase>
+<testcase name="signed policy rejects modified ownership, size and MIME; invalid image fails processor" classname="full-stack.spec.js" time="5.444">
+<properties>
+<property name="serial" value="">
+</property>
+</properties>
+</testcase>
+</testsuite>
+</testsuites>
